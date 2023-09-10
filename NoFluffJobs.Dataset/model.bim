@@ -614,10 +614,30 @@
                 "value": "Automatic"
               }
             ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
             "dataType": "string",
             "lineageTag": "56e4e2de-6a28-4a49-ae41-40553617f16c",
+            "sortByColumn": "Category sort",
             "sourceColumn": "Salary category",
             "summarizeBy": "none"
+          },
+          {
+            "name": "Category sort",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "93dc71c4-c9a7-40ea-9a00-72e083b04936",
+            "sourceColumn": "Category sort",
+            "summarizeBy": "sum"
           }
         ],
         "lineageTag": "587f45cd-0f38-4a9e-8719-7240f8fd3e24",
@@ -632,15 +652,19 @@
                 "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
                 "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.salary\"),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.id\", type text}, {\"Column1.salary.type\", type text}, {\"Column1.salary.currency\", type text}, {\"Column1.salary.from\", Int64.Type}, {\"Column1.salary.to\", Int64.Type}}),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
                 "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
                 "if [Salary to] < 20000 then \"Up to 20.000\" else",
                 "if [Salary to] < 30000 then \"Up to 30.000\" else ",
                 "if [Salary to] < 40000 then \"Up to 40.000\" else",
-                "\"More then 40.000\")",
+                "\"More then 40.000\"),",
+                "    #\"Dodano kolumnę niestandardową1\" = Table.AddColumn(#\"Dodano kolumnę niestandardową\", \"Category sort\", each if [Salary to] < 10000 then 0 else",
+                "if [Salary to] < 20000 then 1 else ",
+                "if [Salary to] < 30000 then 2 else ",
+                "if [Salary to] < 40000 then 3 else 4),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}})",
                 "in",
-                "    #\"Dodano kolumnę niestandardową\""
+                "    #\"Zmieniono typ\""
               ],
               "type": "m"
             }
@@ -775,7 +799,12 @@
             "expression": [
               "",
               "var cnt = COUNT('Jobs ID'[ID])",
-              "return IF(ISBLANK(cnt),0,cnt)"
+              "var valueToReturn = ",
+              "    IF(",
+              "        ISBLANK(cnt),",
+              "        0,",
+              "        cnt)",
+              "return valueToReturn"
             ],
             "formatString": "0",
             "lineageTag": "77ea82a6-4d3b-4c43-af9c-467854d2e59e"
@@ -792,8 +821,13 @@
               "",
               "var sumMin = SUM(Salary[Salary from])",
               "var sumMax = SUM(Salary[Salary to])",
-              "var averageSalary = (sumMax + sumMin) / (COUNT(Salary[ID]) * 2)",
-              "return IF(ISBLANK(averageSalary),0, averageSalary)"
+              "var countSalaryRows = COUNTROWS(Salary)",
+              "var averageSalary = (sumMax + sumMin) / (countSalaryRows * 2)",
+              "var valueToReturn = IF(",
+              "    ISBLANK(averageSalary),",
+              "    0, ",
+              "    averageSalary)",
+              "return valueToReturn"
             ],
             "lineageTag": "d75a7bca-ffe3-467d-ade5-a65c207f6267"
           },
@@ -801,23 +835,28 @@
             "name": "Most Popular Technology",
             "expression": [
               "",
-              "VAR MostPopularTechTable = ",
+              "var mostPopularTechTable = ",
               "    ADDCOLUMNS(",
               "        'Technology DIM', ",
               "        \"Cnt\", [Job offerts])",
-              "VAR MostPopularTech = ",
+              "var mostPopularTechRank = ",
               "    ADDCOLUMNS(",
-              "        MostPopularTechTable,",
+              "        mostPopularTechTable,",
               "        \"Rank\",",
               "        RANKX(",
-              "            MostPopularTechTable,",
+              "            mostPopularTechTable,",
               "            [Cnt], ,",
               "            DESC,",
               "            Dense))",
-              "VAR Rank1 = FILTER(MostPopularTech, [Rank] = 1 && [Cnt] <> 0)",
-              "VAR Technologie = CONCATENATEX(Rank1,[Technology], \" & \")",
-              "RETURN",
-              "    IF(ISBLANK(Technologie),\"No job offerts\",Technologie)"
+              "var rank1 = FILTER(mostPopularTechRank, [Rank] = 1 && [Cnt] <> 0)",
+              "var technology = CONCATENATEX(rank1,[Technology], \" & \")",
+              "var valueToReturn =  ",
+              "    IF(",
+              "        ISBLANK(technology),",
+              "        \"No job offerts\",",
+              "        technology)",
+              "return",
+              "   valueToReturn"
             ],
             "lineageTag": "39539f1e-d7ae-4813-b910-1dc0f52828ff"
           },
@@ -825,23 +864,27 @@
             "name": "Best Payed Technology",
             "expression": [
               "",
-              "VAR MostPopularTechTable = ",
+              "var mostPopularTechTable = ",
               "    ADDCOLUMNS(",
               "        'Technology DIM', ",
               "        \"Average\", [Average Salaty])",
-              "VAR MostPopularTech = ",
+              "var mostPopularTech = ",
               "    ADDCOLUMNS(",
-              "        MostPopularTechTable,",
+              "        mostPopularTechTable,",
               "        \"Rank\",",
               "        RANKX(",
-              "            MostPopularTechTable,",
+              "            mostPopularTechTable,",
               "            [Average], ,",
               "            DESC,",
               "            Dense))",
-              "VAR Rank1 = FILTER(MostPopularTech, [Rank] = 1 && [Average] <> 0)",
-              "VAR Technologie = CONCATENATEX(Rank1,[Technology], \" & \")",
+              "var averageRank = FILTER(mostPopularTech, [Rank] = 1 && [Average] <> 0)",
+              "var technologies = CONCATENATEX(averageRank,[Technology], \" & \")",
+              "var valueToReturn = IF(",
+              "    ISBLANK(technologies),",
+              "    \"No job offerts\",",
+              "    technologies)",
               "RETURN",
-              "    IF(ISBLANK(Technologie),\"No job offerts\",Technologie)",
+              "    valueToReturn",
               ""
             ],
             "lineageTag": "562b0ea1-c383-4619-aefb-6def496b02ed"
@@ -850,20 +893,26 @@
             "name": "Most Popular Category",
             "expression": [
               "",
-              "VAR category = ",
+              "var category = ",
               "    ADDCOLUMNS(",
               "        'Tech category DIM',",
               "        \"CNT\",",
               "        [Job offerts])",
-              "VAR ranking = ",
+              "var ranking = ",
               "    ADDCOLUMNS(",
               "        category,",
               "        \"Rank\",",
               "        RANKX(",
               "            category,",
               "            [Job offerts],,DESC,Dense))",
-              "VAR concate = CONCATENATEX(FILTER(ranking, [Rank] = 1 && [CNT] <> 0),[Category —Pretty],\" & \")",
-              "RETURN IF(ISBLANK(concate),\"No job offerts\", concate)"
+              "var concate = CONCATENATEX(FILTER(ranking, [Rank] = 1 && [CNT] <> 0),[Category —Pretty],\" & \")",
+              "var valueToReturn = ",
+              "    IF(",
+              "        ISBLANK(concate),",
+              "        \"No job offerts\", ",
+              "        concate)",
+              "return ",
+              "    valueToReturn"
             ],
             "lineageTag": "da3091b4-fd93-4dcc-acdd-e7f8fd588854"
           }
@@ -1488,6 +1537,10 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
           }
         ],
         "columns": [
@@ -1545,6 +1598,10 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
           }
         ],
         "columns": [
