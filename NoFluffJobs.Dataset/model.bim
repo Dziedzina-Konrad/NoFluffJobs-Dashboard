@@ -516,7 +516,7 @@
           },
           {
             "name": "PBI_NavigationStepName",
-            "value": "Nawigacja"
+            "value": "Navigation"
           }
         ],
         "columns": [
@@ -653,6 +653,7 @@
                 "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.salary\"),",
                 "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+                "    // Rozwiązanie tymczasowe, do zastąpienia po wdrożeniu przeliczników walutowych.",
                 "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
                 "if [Salary to] < 20000 then \"Up to 20.000\" else",
                 "if [Salary to] < 30000 then \"Up to 30.000\" else ",
@@ -796,6 +797,12 @@
         "measures": [
           {
             "name": "Job offerts",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
             "expression": [
               "",
               "var cnt = COUNT('Jobs ID'[ID])",
@@ -806,7 +813,6 @@
               "        cnt)",
               "return valueToReturn"
             ],
-            "formatString": "0",
             "lineageTag": "77ea82a6-4d3b-4c43-af9c-467854d2e59e"
           },
           {
@@ -915,6 +921,22 @@
               "    valueToReturn"
             ],
             "lineageTag": "da3091b4-fd93-4dcc-acdd-e7f8fd588854"
+          },
+          {
+            "name": "Average Salary Seniority General",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salaty], ALL('Seniority DIM'))",
+              "return",
+              "    avgSalaryWithoutSenioroty"
+            ],
+            "lineageTag": "b1db4bfc-0aa9-41bc-a9bf-8186d21b3fa0"
           }
         ],
         "partitions": [
@@ -1537,10 +1559,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Nawigacja"
           }
         ],
         "columns": [
@@ -1598,10 +1616,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Nawigacja"
           }
         ],
         "columns": [
