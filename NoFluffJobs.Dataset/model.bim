@@ -1,0 +1,1923 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "annotations": [
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.120.963.0 (23.08)"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"posting\",\"Seniority\",\"Jobs ID\",\"Salary\",\"Location\",\"Tech\",\"_Measures\",\"Time\",\"Seniority DIM\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Tech category DIM\",\"Non Tech\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "1"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "culture": "pl-PL",
+    "cultures": [
+      {
+        "name": "pl-PL",
+        "linguisticMetadata": {
+          "content": {
+            "DynamicImprovement": "HighConfidence",
+            "Language": "en-US",
+            "Version": "1.0.0"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "expressions": [
+      {
+        "name": "posting",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Źródło = Json.Document(Web.Contents(\"https://nofluffjobs.com/api/posting\")),",
+          "    postings = Źródło[postings],",
+          "    #\"Przekonwertowane na tabelę\" = Table.FromList(postings, Splitter.SplitByNothing(), null, null, ExtraValues.Error)",
+          "in",
+          "    #\"Przekonwertowane na tabelę\""
+        ],
+        "kind": "m",
+        "lineageTag": "94d9605b-d18d-4e4f-91e0-9abb568cdbcf"
+      }
+    ],
+    "relationships": [
+      {
+        "name": "48fefe90-2fd2-4852-ae2d-357ccead58ef",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "ID",
+        "fromTable": "Seniority",
+        "toColumn": "ID",
+        "toTable": "Jobs ID"
+      },
+      {
+        "name": "6ef206e5-9bb8-490d-9e4b-8450788c6574",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "ID",
+        "fromTable": "Tech",
+        "toColumn": "ID",
+        "toTable": "Jobs ID"
+      },
+      {
+        "name": "ab893ffc-5671-439c-9a38-272cedaaaceb",
+        "crossFilteringBehavior": "bothDirections",
+        "fromCardinality": "one",
+        "fromColumn": "ID",
+        "fromTable": "Jobs ID",
+        "toColumn": "ID",
+        "toTable": "Salary"
+      },
+      {
+        "name": "434b8ace-a039-4bcc-933d-859f2c0b7bc4",
+        "fromColumn": "PostedDate",
+        "fromTable": "Time",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_38665d87-a668-4f23-945d-d8ab18ba6af4"
+      },
+      {
+        "name": "6f358939-556a-4053-bfca-50a4828e8e2f",
+        "fromColumn": "RenewedDate",
+        "fromTable": "Time",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_815af6cc-39a4-42fc-a4c4-2fd311b72361"
+      },
+      {
+        "name": "104c7328-a7b3-4b81-a36a-cb6d68c50f03",
+        "crossFilteringBehavior": "bothDirections",
+        "fromCardinality": "one",
+        "fromColumn": "ID",
+        "fromTable": "Time",
+        "toColumn": "ID",
+        "toTable": "Jobs ID"
+      },
+      {
+        "name": "8b0d98ce-5953-4b17-945c-36ca95489a7b",
+        "fromColumn": "Seniorty",
+        "fromTable": "Seniority",
+        "toColumn": "Seniorty",
+        "toTable": "Seniority DIM"
+      },
+      {
+        "name": "cc88e370-9a41-4118-b5b4-817237670bea",
+        "fromColumn": "Contract type",
+        "fromTable": "Salary",
+        "toColumn": "Contract type",
+        "toTable": "Contract types DIM"
+      },
+      {
+        "name": "eb022752-6ed2-4c9a-a874-cbd856e7c349",
+        "fromColumn": "Currency",
+        "fromTable": "Salary",
+        "toColumn": "Currency",
+        "toTable": "Currencies DIM"
+      },
+      {
+        "name": "8bd92d1c-5362-445d-a8c7-cc05199788ed",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "ID",
+        "fromTable": "Location",
+        "toColumn": "ID",
+        "toTable": "Jobs ID"
+      },
+      {
+        "name": "6b2dbcaf-69b6-4122-a71b-27f28fcd88d6",
+        "fromColumn": "Category",
+        "fromTable": "Tech",
+        "toColumn": "Category",
+        "toTable": "Tech category DIM"
+      },
+      {
+        "name": "26f11e88-35a9-43ec-ba84-c65edf687ce0",
+        "fromColumn": "Technology",
+        "fromTable": "Tech",
+        "toColumn": "Technology",
+        "toTable": "Technology DIM"
+      },
+      {
+        "name": "6d5bd085-4cd2-42fb-add7-9b851945a7bd",
+        "fromColumn": "ID",
+        "fromTable": "Non Tech",
+        "toColumn": "ID",
+        "toTable": "Jobs ID"
+      }
+    ],
+    "sourceQueryCulture": "pl-PL",
+    "tables": [
+      {
+        "name": "DateTableTemplate_5ce98111-93e3-4e3e-8715-c33b59400b29",
+        "annotations": [
+          {
+            "name": "__PBI_TemplateDateTable",
+            "value": "true"
+          },
+          {
+            "name": "DefaultItem",
+            "value": "DateHierarchy"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "7c3be428-cfc3-4c75-9e12-5f473a014f7a",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Rok",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "9e25dcaa-b5df-453c-8980-0578932f4a72",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer miesiąca",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "8552fd7c-b8f2-493e-a365-94331fca83a0",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Miesiąc",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "c7ec036b-46a5-4023-aed4-90e7a5a7b139",
+            "sortByColumn": "Numer miesiąca",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer kwartału",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([Numer miesiąca] + 2) / 3)",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "76941ea8-91e4-4f8f-8982-15408fbdbc40",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Kwartał",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Kwartał \" & [Numer kwartału]",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "26c41cdd-31be-4d07-b389-583fc751a6f4",
+            "sortByColumn": "Numer kwartału",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dzień",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "2eaee434-3e77-4ab0-9827-ca560077d44a",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarchia dat",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Rok",
+                "column": "Rok",
+                "lineageTag": "c8b6edb3-aec5-463a-a9f5-b7188ed3bf2f",
+                "ordinal": 0
+              },
+              {
+                "name": "Kwartał",
+                "column": "Kwartał",
+                "lineageTag": "419cc4a4-bd6e-49be-97b6-80e6b08291ae",
+                "ordinal": 1
+              },
+              {
+                "name": "Miesiąc",
+                "column": "Miesiąc",
+                "lineageTag": "2c7dc873-b305-46cf-ad8e-8c8b77dc6834",
+                "ordinal": 2
+              },
+              {
+                "name": "Dzień",
+                "column": "Dzień",
+                "lineageTag": "87d86ea7-61ef-4fc9-b6b5-378314c70bef",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "3a147c9a-9074-49c2-ab6f-60f88be178ae"
+          }
+        ],
+        "isHidden": true,
+        "isPrivate": true,
+        "lineageTag": "59f23e2f-eae5-4b60-87e6-43d35b12bde8",
+        "partitions": [
+          {
+            "name": "DateTableTemplate_5ce98111-93e3-4e3e-8715-c33b59400b29-fa6a3d16-7d4b-41a6-80d9-a836c17e1471",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(2015,1,1), Date(2015,1,1))",
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Seniority",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "bf9c5c37-a3a9-427e-bc6b-5454efa6e1f3",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Seniorty",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "72a33760-46e3-4d98-b885-50e15fa03a69",
+            "sourceColumn": "Seniorty",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "55a3dd63-9689-4081-aab1-013a45461e3d",
+        "partitions": [
+          {
+            "name": "Seniority",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"seniority\"}, {\"Column1.id\", \"Column1.seniority\"}),",
+                "    #\"Rozwinięty element Column1.seniority\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.seniority\"),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.seniority\"),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.id\", type text}, {\"Column1.seniority\", type text}}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.id\", \"ID\"}, {\"Column1.seniority\", \"Seniorty\"}})",
+                "in",
+                "    #\"Zmieniono nazwy kolumn\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Jobs ID",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "ad6e40ab-f197-4124-a858-adef919d0b9a",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Company",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "10d02bfb-9ded-4141-8945-282259f9dd65",
+            "sourceColumn": "Company",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "73f47358-0e47-4a92-ba1f-4fb07651f2ec",
+            "sourceColumn": "Title",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
+        "partitions": [
+          {
+            "name": "Jobs ID",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"name\", \"title\"}, {\"Column1.id\", \"Column1.name\", \"Column1.title\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.name\", \"Company\"}, {\"Column1.title\", \"Title\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Company\", type text}, {\"Title\", type text}})",
+                "in",
+                "    #\"Zmieniono typ\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Salary",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3b84ea79-aed1-453e-b2fa-d784cc3d07d0",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Salary from",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "5609e67b-64be-4bbf-a97a-b6c4afc34552",
+            "sourceColumn": "Salary from",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Salary to",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "d0e58840-597b-455c-82e6-1d81d69129dd",
+            "sourceColumn": "Salary to",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Contract type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "6ee7252c-086c-4cea-9bbc-92da3c7c3df0",
+            "sourceColumn": "Contract type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Currency",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "e029223f-55d5-4b08-9fa2-fcfbad16d8b2",
+            "sourceColumn": "Currency",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Average",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "expression": "(Salary[Salary from] + Salary[Salary to]) / 2",
+            "isDataTypeInferred": true,
+            "lineageTag": "ec2980b2-eabc-4bf0-8076-3fe9f0ceae85",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Salary category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "56e4e2de-6a28-4a49-ae41-40553617f16c",
+            "sourceColumn": "Salary category",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "587f45cd-0f38-4a9e-8719-7240f8fd3e24",
+        "partitions": [
+          {
+            "name": "Salary",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
+                "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.salary\"),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.id\", type text}, {\"Column1.salary.type\", type text}, {\"Column1.salary.currency\", type text}, {\"Column1.salary.from\", Int64.Type}, {\"Column1.salary.to\", Int64.Type}}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
+                "if [Salary to] < 20000 then \"Up to 20.000\" else",
+                "if [Salary to] < 30000 then \"Up to 30.000\" else ",
+                "if [Salary to] < 40000 then \"Up to 40.000\" else",
+                "\"More then 40.000\")",
+                "in",
+                "    #\"Dodano kolumnę niestandardową\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Tech",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "34d7feb2-05b2-4f47-b906-acc3c8b75d22",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Technology",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3f27dc3f-8a41-4b25-b9bd-c8ff681225a3",
+            "sourceColumn": "Technology",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "daa07ebe-1e55-4373-8a83-285e66230986",
+            "sourceColumn": "Category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Flavors",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "595053d3-cb0d-4f65-9b63-8b66806778d1",
+            "sourceColumn": "Flavors",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "3a0ea90f-19e9-47e1-9d2a-9f0f4ddf30c6",
+        "partitions": [
+          {
+            "name": "Tech",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"technology\", \"category\", \"flavors\"}, {\"Column1.id\", \"Column1.technology\", \"Column1.category\", \"Column1.flavors\"}),",
+                "    #\"Rozwinięty element Column1.flavors\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.flavors\"),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.flavors\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}, {\"Column1.flavors\", \"Flavors\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Technology\", type text}, {\"Category\", type text}, {\"Flavors\", type text}}),",
+                "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
+                "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
+                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}}),",
+                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] <> null and [Technology] <> \"\"))",
+                "in",
+                "    #\"Przefiltrowano wiersze\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "_Measures",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Kolumna 1",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "26d4c297-66e2-462a-a453-ed266039c8ed",
+            "sourceColumn": "Kolumna 1",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "9c6f3896-b824-4110-a225-e78fe0a91a23",
+        "measures": [
+          {
+            "name": "Job offerts",
+            "expression": [
+              "",
+              "var cnt = COUNT('Jobs ID'[ID])",
+              "return IF(ISBLANK(cnt),0,cnt)"
+            ],
+            "formatString": "0",
+            "lineageTag": "77ea82a6-4d3b-4c43-af9c-467854d2e59e"
+          },
+          {
+            "name": "Average Salaty",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var sumMin = SUM(Salary[Salary from])",
+              "var sumMax = SUM(Salary[Salary to])",
+              "var averageSalary = (sumMax + sumMin) / (COUNT(Salary[ID]) * 2)",
+              "return IF(ISBLANK(averageSalary),0, averageSalary)"
+            ],
+            "lineageTag": "d75a7bca-ffe3-467d-ade5-a65c207f6267"
+          },
+          {
+            "name": "Most Popular Technology",
+            "expression": [
+              "",
+              "VAR MostPopularTechTable = ",
+              "    ADDCOLUMNS(",
+              "        'Technology DIM', ",
+              "        \"Cnt\", [Job offerts])",
+              "VAR MostPopularTech = ",
+              "    ADDCOLUMNS(",
+              "        MostPopularTechTable,",
+              "        \"Rank\",",
+              "        RANKX(",
+              "            MostPopularTechTable,",
+              "            [Cnt], ,",
+              "            DESC,",
+              "            Dense))",
+              "VAR Rank1 = FILTER(MostPopularTech, [Rank] = 1 && [Cnt] <> 0)",
+              "VAR Technologie = CONCATENATEX(Rank1,[Technology], \" & \")",
+              "RETURN",
+              "    IF(ISBLANK(Technologie),\"No job offerts\",Technologie)"
+            ],
+            "lineageTag": "39539f1e-d7ae-4813-b910-1dc0f52828ff"
+          },
+          {
+            "name": "Best Payed Technology",
+            "expression": [
+              "",
+              "VAR MostPopularTechTable = ",
+              "    ADDCOLUMNS(",
+              "        'Technology DIM', ",
+              "        \"Average\", [Average Salaty])",
+              "VAR MostPopularTech = ",
+              "    ADDCOLUMNS(",
+              "        MostPopularTechTable,",
+              "        \"Rank\",",
+              "        RANKX(",
+              "            MostPopularTechTable,",
+              "            [Average], ,",
+              "            DESC,",
+              "            Dense))",
+              "VAR Rank1 = FILTER(MostPopularTech, [Rank] = 1 && [Average] <> 0)",
+              "VAR Technologie = CONCATENATEX(Rank1,[Technology], \" & \")",
+              "RETURN",
+              "    IF(ISBLANK(Technologie),\"No job offerts\",Technologie)",
+              ""
+            ],
+            "lineageTag": "562b0ea1-c383-4619-aefb-6def496b02ed"
+          },
+          {
+            "name": "Most Popular Category",
+            "expression": [
+              "",
+              "VAR category = ",
+              "    ADDCOLUMNS(",
+              "        'Tech category DIM',",
+              "        \"CNT\",",
+              "        [Job offerts])",
+              "VAR ranking = ",
+              "    ADDCOLUMNS(",
+              "        category,",
+              "        \"Rank\",",
+              "        RANKX(",
+              "            category,",
+              "            [Job offerts],,DESC,Dense))",
+              "VAR concate = CONCATENATEX(FILTER(ranking, [Rank] = 1 && [CNT] <> 0),[Category —Pretty],\" & \")",
+              "RETURN IF(ISBLANK(concate),\"No job offerts\", concate)"
+            ],
+            "lineageTag": "da3091b4-fd93-4dcc-acdd-e7f8fd588854"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "_Measures",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(\"i44FAA==\", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#\"Kolumna 1\" = _t])",
+                "in",
+                "    Źródło"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Time",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "8b7817a7-29fc-4902-b288-09ea8c775b22",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "PostedDate",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "88a47f6f-4b90-4b6f-ac24-68e0dc3c4b27",
+            "sourceColumn": "PostedDate",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Odmiana",
+                "defaultHierarchy": {
+                  "hierarchy": "Hierarchia dat",
+                  "table": "LocalDateTable_38665d87-a668-4f23-945d-d8ab18ba6af4"
+                },
+                "isDefault": true,
+                "relationship": "434b8ace-a039-4bcc-933d-859f2c0b7bc4"
+              }
+            ]
+          },
+          {
+            "name": "RenewedDate",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "d28834c2-041c-474c-bc3c-35ce21b3faf1",
+            "sourceColumn": "RenewedDate",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Odmiana",
+                "defaultHierarchy": {
+                  "hierarchy": "Hierarchia dat",
+                  "table": "LocalDateTable_815af6cc-39a4-42fc-a4c4-2fd311b72361"
+                },
+                "isDefault": true,
+                "relationship": "6f358939-556a-4053-bfca-50a4828e8e2f"
+              }
+            ]
+          }
+        ],
+        "lineageTag": "b603d561-31da-4cf5-96af-43d39ce367ab",
+        "partitions": [
+          {
+            "name": "Time",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"posted\", \"renewed\"}, {\"id\", \"posted\", \"renewed\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1\"),",
+                "    ",
+                "    // Bezpieczna konwersja dla 'posted'",
+                "    #\"Bezpieczna konwersja posted\" = Table.AddColumn(#\"Usunięto duplikaty\", \"UnixTimestampPosted\", each if [posted] = null then null else #duration(0, 0, 0, [posted] / 1000)),",
+                "    // Konwersja na datatime dla 'posted'",
+                "    #\"Bezpieczna data posted\" = Table.AddColumn(#\"Bezpieczna konwersja posted\", \"NewDateTimePosted\", each if [UnixTimestampPosted] = null then null else #datetimezone(1970, 1, 1, 0, 0, 0, 0, 0) + [UnixTimestampPosted]),",
+                "",
+                "    // Bezpieczna konwersja dla 'renewed'",
+                "    #\"Bezpieczna konwersja renewed\" = Table.AddColumn(#\"Bezpieczna data posted\", \"UnixTimestamp Renewed\", each if [renewed] = null then null else #duration(0, 0, 0, [renewed] / 1000)),",
+                "    // Konwersja na datatime dla 'renewed'",
+                "    #\"Bezpieczna data renewed\" = Table.AddColumn(#\"Bezpieczna konwersja renewed\", \"NewDateTime Renewed\", each if [UnixTimestamp Renewed] = null then null else #datetimezone(1970, 1, 1, 0, 0, 0, 0, 0) + [UnixTimestamp Renewed]),",
+                "    #\"Usunięto kolumny\" = Table.RemoveColumns(#\"Bezpieczna data renewed\",{\"posted\", \"renewed\", \"UnixTimestampPosted\", \"UnixTimestamp Renewed\"}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto kolumny\",{{\"id\", type text}, {\"NewDateTimePosted\", type date}, {\"NewDateTime Renewed\", type date}}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"id\", \"ID\"}, {\"NewDateTimePosted\", \"PostedDate\"}, {\"NewDateTime Renewed\", \"RenewedDate\"}})",
+                "in",
+                "    #\"Zmieniono nazwy kolumn\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_38665d87-a668-4f23-945d-d8ab18ba6af4",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "d8a95b1a-8199-4dc2-b44e-76f623978606",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Rok",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "7fe72f0c-7345-44b5-b72e-50c44a6b4d17",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer miesiąca",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "a89c4908-94b0-4e02-a89a-ddddcd4b7477",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Miesiąc",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "724d8aec-8bda-455b-b074-52628d0be8b0",
+            "sortByColumn": "Numer miesiąca",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer kwartału",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([Numer miesiąca] + 2) / 3)",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "86a21a0e-cb09-49b4-81d3-545f6734f74d",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Kwartał",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Kwartał \" & [Numer kwartału]",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "252aa54a-8342-4c0a-8bcf-49bec6e94afd",
+            "sortByColumn": "Numer kwartału",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dzień",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "23f46af6-4f63-43bb-ad0a-19882702b501",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarchia dat",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Rok",
+                "column": "Rok",
+                "lineageTag": "41942a2a-bba3-40cb-a3a9-851f3ff014fb",
+                "ordinal": 0
+              },
+              {
+                "name": "Kwartał",
+                "column": "Kwartał",
+                "lineageTag": "5b850034-c857-4798-9b81-ce927fe9c058",
+                "ordinal": 1
+              },
+              {
+                "name": "Miesiąc",
+                "column": "Miesiąc",
+                "lineageTag": "28fafabc-d8cb-48aa-97ef-9804cc57c25f",
+                "ordinal": 2
+              },
+              {
+                "name": "Dzień",
+                "column": "Dzień",
+                "lineageTag": "ca023837-ef4d-4f97-9a79-ed292dccdc53",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "2509eb04-2c73-4b03-8d63-0a040d704dd8"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "68d430c0-ec09-42dc-ae3e-613670b24b3d",
+        "partitions": [
+          {
+            "name": "LocalDateTable_38665d87-a668-4f23-945d-d8ab18ba6af4",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Time'[PostedDate])), 1, 1), Date(Year(MAX('Time'[PostedDate])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "LocalDateTable_815af6cc-39a4-42fc-a4c4-2fd311b72361",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "8e058eb0-96b1-4af8-ad83-f34a3db79124",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Rok",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "564bf0fd-415c-402e-92ba-933ca43a1b0e",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer miesiąca",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "19969067-c613-4861-a5e1-3086a0cc184c",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Miesiąc",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "41fae3c9-10ad-474d-8f69-5633f9629929",
+            "sortByColumn": "Numer miesiąca",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Numer kwartału",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([Numer miesiąca] + 2) / 3)",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "28a45117-9356-4882-a4ae-f94d0653298a",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Kwartał",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Kwartał \" & [Numer kwartału]",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "40c67b64-a024-4672-8975-d72d479d6bdd",
+            "sortByColumn": "Numer kwartału",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dzień",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "1e3e4836-48cb-4a96-ba35-bed4b0257db9",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarchia dat",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Rok",
+                "column": "Rok",
+                "lineageTag": "d67ac3e2-0eae-4ae5-86a2-0d393e153695",
+                "ordinal": 0
+              },
+              {
+                "name": "Kwartał",
+                "column": "Kwartał",
+                "lineageTag": "bd2ade3d-b0f0-4ca6-a23e-137a10febb07",
+                "ordinal": 1
+              },
+              {
+                "name": "Miesiąc",
+                "column": "Miesiąc",
+                "lineageTag": "e647cd39-2168-41bc-8cba-24a0266767d5",
+                "ordinal": 2
+              },
+              {
+                "name": "Dzień",
+                "column": "Dzień",
+                "lineageTag": "7d267db8-cadf-4486-aaaf-bbdf984b7481",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "67d56b4e-928a-4986-a7f0-a2e012722159"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "c01349ca-65ef-4d8d-a959-f7e590ae80c1",
+        "partitions": [
+          {
+            "name": "LocalDateTable_815af6cc-39a4-42fc-a4c4-2fd311b72361",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Time'[RenewedDate])), 1, 1), Date(Year(MAX('Time'[RenewedDate])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "Seniority DIM",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Seniorty",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3cfddc80-777f-494d-8edd-b909a248c3d3",
+            "sortByColumn": "Seniority order",
+            "sourceColumn": "Seniorty",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Seniority order",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "323a81f9-8908-4ebf-88fc-865c83988a7c",
+            "sourceColumn": "Seniority order",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "e115afc2-cc90-4aac-bd8a-0c6a4f4a4a9f",
+        "partitions": [
+          {
+            "name": "Seniority DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Seniority,",
+                "    #\"Usunięto kolumny\" = Table.RemoveColumns(Źródło,{\"ID\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto kolumny\"),",
+                "    // Dodano kolumne do sortowania seniority",
+                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Usunięto duplikaty\", \"Seniority order\", each if [Seniorty] = \"Senior\" then 2 else if [Seniorty] = \"Expert\" then 1 else if [Seniorty] = \"Mid\" then 3 else if [Seniorty] = \"Junior\" then 4 else 5),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową\",{{\"Seniority order\", Int64.Type}})",
+                "in",
+                "    #\"Zmieniono typ\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Contract types DIM",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Contract type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "65f630b8-c223-4a46-8ed8-f9ed72ae3436",
+            "sourceColumn": "Contract type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Contract",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "39864b73-846a-4c72-afb2-18ca18706cb7",
+            "sourceColumn": "Contract",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "972d004e-56f1-47db-a286-349c9c7cfc06",
+        "partitions": [
+          {
+            "name": "Contract types DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Salary,",
+                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Contract type\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\"),",
+                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Usunięto duplikaty\", \"Contract\", each if [Contract type] = \"b2b\" or [Contract type] = \"uod\" then Text.Upper([Contract type])",
+                "else Text.Proper([Contract type]))",
+                "in",
+                "    #\"Dodano kolumnę niestandardową\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Currencies DIM",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Currency",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "4a6b0e2e-2b85-4de9-970d-679e0d657586",
+            "sourceColumn": "Currency",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "610afe22-4acd-4036-b03a-25925e1b6127",
+        "partitions": [
+          {
+            "name": "Currencies DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Salary,",
+                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Currency\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\")",
+                "in",
+                "    #\"Usunięto duplikaty\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Location",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "ab35b6f1-a85f-4a8f-94a4-0adccd5627ae",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "City",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "58a665ea-fb9b-4519-a777-aaf736633410",
+            "sourceColumn": "City",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Country",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "0e57eaa0-a9f2-43f7-a3b5-cb0fd1e7c6d1",
+            "sourceColumn": "Country",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Latitude",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "DataType"
+              }
+            ],
+            "dataCategory": "Latitude",
+            "dataType": "double",
+            "lineageTag": "b27a49be-a88d-4a11-9c8e-add114e4a1d1",
+            "sourceColumn": "Latitude",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Longitude",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataCategory": "Longitude",
+            "dataType": "double",
+            "lineageTag": "da48bf02-f1e7-4404-82b3-8a34142056cf",
+            "sourceColumn": "Longitude",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "FullyRemote",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "boolean",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "lineageTag": "9f067eff-d51c-4128-a6a5-898163963b50",
+            "sourceColumn": "FullyRemote",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "c4c40b8b-0a1e-4c4c-b970-0c73fca85efe",
+        "partitions": [
+          {
+            "name": "Location",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Json.Document(Web.Contents(\"https://nofluffjobs.com/api/posting\")),",
+                "    postings = Źródło[postings],",
+                "    #\"Przekonwertowane na tabelę\" = Table.FromList(postings, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(#\"Przekonwertowane na tabelę\", \"Column1\", {\"id\", \"location\"}, {\"Column1.id\", \"Column1.location\"}),",
+                "    #\"Rozwinięty element Column1.location\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.location\", {\"places\", \"fullyRemote\"}, {\"Column1.location.places\", \"Column1.location.fullyRemote\"}),",
+                "    #\"Rozwinięty element Column1.location.places\" = Table.ExpandListColumn(#\"Rozwinięty element Column1.location\", \"Column1.location.places\"),",
+                "    #\"Rozwinięty element Column1.location.places1\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1.location.places\", \"Column1.location.places\", {\"city\", \"country\", \"geoLocation\"}, {\"Column1.location.places.city\", \"Column1.location.places.country\", \"Column1.location.places.geoLocation\"}),",
+                "    #\"Rozwinięty element Column1.location.places.country\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1.location.places1\", \"Column1.location.places.country\", {\"name\"}, {\"Column1.location.places.country.name\"}),",
+                "    #\"Rozwinięty element Column1.location.places.geoLocation\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1.location.places.country\", \"Column1.location.places.geoLocation\", {\"latitude\", \"longitude\"}, {\"Column1.location.places.geoLocation.latitude\", \"Column1.location.places.geoLocation.longitude\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.location.places.geoLocation\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Column1.location.places.city\", type text}, {\"Column1.location.places.country.name\", type text}, {\"Column1.location.places.geoLocation.latitude\", type number}, {\"Column1.location.places.geoLocation.longitude\", type number}, {\"Column1.location.fullyRemote\", type logical}}),",
+                "    #\"Zmieniono nazwy kolumn1\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.location.places.city\", \"City\"}, {\"Column1.location.places.country.name\", \"Country\"}, {\"Column1.location.places.geoLocation.latitude\", \"Latitude\"}, {\"Column1.location.places.geoLocation.longitude\", \"Longitude\"}, {\"Column1.location.fullyRemote\", \"FullyRemote\"}}),",
+                "    #\"Usunięto duplikaty1\" = Table.Distinct(#\"Zmieniono nazwy kolumn1\")",
+                "in",
+                "    #\"Usunięto duplikaty1\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Technology DIM",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Technology",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "4a4b6c5a-a15e-41dc-ae1a-8fc5584182ec",
+            "sourceColumn": "Technology",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "7a09890e-b7b6-4a67-8c8f-594b37271e6a",
+        "partitions": [
+          {
+            "name": "Technology DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Tech,",
+                "    // Normalizacja tekstu ze względu na problem z usunięciem duplikatów",
+                "    #\"Normalizacja tekstu\" = Table.TransformColumns(Źródło, {{\"Technology\", Text.From, type text}}),",
+                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(#\"Normalizacja tekstu\",{\"Technology\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\", {\"Technology\"}),",
+                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Usunięto duplikaty\", each ([Technology] <> null and [Technology] <> \"\"))",
+                "in",
+                "    #\"Przefiltrowano wiersze\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Tech category DIM",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "af02b2ca-7804-4a33-b061-41eb98509e6e",
+            "sourceColumn": "Category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Category —Pretty",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "fdb69e99-2ec7-4bb1-bb76-6d85cd9eb9b3",
+            "sourceColumn": "Category —Pretty",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "a4f9a030-9a5a-43ae-91d4-c857fc062ab0",
+        "partitions": [
+          {
+            "name": "Tech category DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = Tech,",
+                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Category\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\"),",
+                "    #\"Zduplikowano kolumnę\" = Table.DuplicateColumn(#\"Usunięto duplikaty\", \"Category\", \"Category — kopia\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zduplikowano kolumnę\",{{\"Category — kopia\", \"Category —Pretty\"}}),",
+                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Zmieniono nazwy kolumn\",{{\"Category —Pretty\", Text.Proper, type text}})",
+                "in",
+                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Non Tech",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Nawigacja"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "af7c161d-818c-4229-a858-a759b37971b9",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Technology",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5b52deaf-ef79-40b7-964d-fe49e1abfe84",
+            "sourceColumn": "Technology",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "68a175e8-66cf-4daf-a4ab-6438e12a7026",
+            "sourceColumn": "Category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Flavors",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "a7eecd96-5465-4205-8e8c-9551a54db7d9",
+            "sourceColumn": "Flavors",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "7bafa4bf-d6b5-4143-81dd-b152f9c3bd13",
+        "partitions": [
+          {
+            "name": "Non Tech",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"technology\", \"category\", \"flavors\"}, {\"Column1.id\", \"Column1.technology\", \"Column1.category\", \"Column1.flavors\"}),",
+                "    #\"Rozwinięty element Column1.flavors\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.flavors\"),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.flavors\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}, {\"Column1.flavors\", \"Flavors\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Technology\", type text}, {\"Category\", type text}, {\"Flavors\", type text}}),",
+                "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
+                "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
+                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}}),",
+                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] = null or [Technology] = \"\"))",
+                "in",
+                "    #\"Przefiltrowano wiersze\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
