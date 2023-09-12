@@ -638,6 +638,92 @@
             "lineageTag": "93dc71c4-c9a7-40ea-9a00-72e083b04936",
             "sourceColumn": "Category sort",
             "summarizeBy": "sum"
+          },
+          {
+            "name": "Column1",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "expression": [
+              "",
+              "// Calculate create new filter context over row context and because of one side of this table it looks like working in row context.",
+              "CALCULATE(AVERAGEX(Salary, (Salary[Salary from] + Salary[Salary to]) / 2))"
+            ],
+            "isDataTypeInferred": true,
+            "lineageTag": "f4eed67b-7aa9-42c2-b474-324c483a4d55",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "cnt",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "expression": [
+              "",
+              "// Both filter are applyed, from contex transition and from 1 parametr",
+              "CALCULATE(COUNTX(Salary,Salary[Salary from]), Salary[Contract type] == \"b2b\")"
+            ],
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "lineageTag": "91ab2c78-6323-453d-863c-80d2901c73ba",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Column",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "expression": [
+              "",
+              "// New row contex that itterate over table without outer context",
+              "AVERAGEX(Salary, (Salary[Salary from] + Salary[Salary to]) / 2)"
+            ],
+            "isDataTypeInferred": true,
+            "lineageTag": "6716d6e4-7e01-41e5-83ec-4901183d002b",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "cnt2",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "expression": [
+              "",
+              "// Now filter overwriting transition context and return all b2b rows in table to count ",
+              "CALCULATE(COUNTX(Salary,Salary[Salary from]), FILTER(Salary,Salary[Contract type] == \"b2b\"))"
+            ],
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "lineageTag": "0dc162d6-ad4a-4425-be2b-2d4a0b5648d7",
+            "summarizeBy": "sum",
+            "type": "calculated"
           }
         ],
         "lineageTag": "587f45cd-0f38-4a9e-8719-7240f8fd3e24",
@@ -803,6 +889,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Counts",
             "expression": [
               "",
               "var cnt = COUNT('Jobs ID'[ID])",
@@ -823,6 +910,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Salary",
             "expression": [
               "",
               "var sumMin = SUM(Salary[Salary from])",
@@ -839,6 +927,7 @@
           },
           {
             "name": "Most Popular Technology",
+            "displayFolder": "KPI",
             "expression": [
               "",
               "var mostPopularTechTable = ",
@@ -850,12 +939,17 @@
               "    FILTER(",
               "        mostPopularTechTable, ",
               "        [Cnt] = techMaxCnt && [Cnt] <> 0)",
-              "var technology = CONCATENATEX(mostPopularTech,[Technology], \" & \")",
+              "var technology = CONCATENATEX(mostPopularTech,[Technology Pretty], \" & \")",
+              "var nonTechJobCNT = COUNTROWS('Non Tech')",
+              "var isBlankTech = ISBLANK(technology)",
               "var valueToReturn =  ",
               "    IF(",
-              "        ISBLANK(technology),",
+              "        isBlankTech && nonTechJobCNT =0,",
               "        \"No job offerts\",",
-              "        technology)",
+              "        IF(",
+              "            isBlankTech,",
+              "            \"No tech jobs\", ",
+              "            technology))",
               "return",
               "   valueToReturn"
             ],
@@ -863,6 +957,7 @@
           },
           {
             "name": "Best Payed Technology",
+            "displayFolder": "KPI",
             "expression": [
               "",
               "var techAverageSalary = ",
@@ -878,12 +973,15 @@
               "        techAverageSalary, ",
               "        [Average] = topOneSalary && [Average] <> 0)",
               "",
-              "var technologies = CONCATENATEX(topSalary,[Technology], \" & \")",
-              "",
+              "var technologies = CONCATENATEX(topSalary,[Technology Pretty], \" & \")",
+              "var nonTechJobCNT = COUNTROWS('Non Tech')",
+              "var isBlankTech = ISBLANK(technologies)",
               "var valueToReturn = IF(",
-              "    ISBLANK(technologies),",
+              "    isBlankTech && nonTechJobCNT = 0,",
               "    \"No job offerts\",",
-              "    technologies)",
+              "    IF(isBlankTech,",
+              "    \"No tech jobs\",",
+              "    technologies))",
               "RETURN",
               "    valueToReturn"
             ],
@@ -891,6 +989,7 @@
           },
           {
             "name": "Most Popular Category",
+            "displayFolder": "KPI",
             "expression": [
               "",
               "var category = ",
@@ -900,17 +999,21 @@
               "        [Jobs])",
               "var topCategory = ",
               "    MAXX(category, [CNT])",
-              "var concate = ",
+              "var categories = ",
               "    CONCATENATEX(",
               "        FILTER(category, ",
               "        [CNT] = topCategory && [CNT] <> 0),",
               "        [Category —Pretty]",
               "    ,\" & \")",
+              "var nonTechJobCNT = COUNTROWS('Non Tech')",
+              "var isBlankCategory = ISBLANK(categories)",
               "var valueToReturn = ",
               "    IF(",
-              "        ISBLANK(concate),",
+              "        isBlankCategory && nonTechJobCNT = 0,",
               "        \"No job offerts\", ",
-              "        concate)",
+              "        IF(isBlankCategory,",
+              "        \"No tech jobs\",",
+              "        categories))",
               "return ",
               "    valueToReturn"
             ],
@@ -924,6 +1027,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Salary",
             "expression": [
               "",
               "var avgSalaryWithoutSenioroty = CALCULATE([Average Salaty], ALL('Seniority DIM'))",
@@ -934,6 +1038,7 @@
           },
           {
             "name": "Jobs",
+            "displayFolder": "Counts",
             "expression": "COUNTROWS('Jobs ID')",
             "formatString": "0",
             "lineageTag": "d9191273-a21e-4f65-9b1d-46a4ff2067ff"
@@ -946,6 +1051,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Salary",
             "expression": [
               "",
               "var avgSalaryWithoutSenioroty = CALCULATE([Average Salaty], ALL('Seniority DIM'))",
@@ -1811,7 +1917,7 @@
         "annotations": [
           {
             "name": "PBI_NavigationStepName",
-            "value": "Nawigacja"
+            "value": "Navigation"
           },
           {
             "name": "PBI_ResultType",
@@ -1831,6 +1937,19 @@
             "lineageTag": "4a4b6c5a-a15e-41dc-ae1a-8fc5584182ec",
             "sourceColumn": "Technology",
             "summarizeBy": "none"
+          },
+          {
+            "name": "Technology Pretty",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "70a0237b-ba4d-43e9-ae14-c5d587364a05",
+            "sourceColumn": "Technology Pretty",
+            "summarizeBy": "none"
           }
         ],
         "lineageTag": "7a09890e-b7b6-4a67-8c8f-594b37271e6a",
@@ -1846,9 +1965,14 @@
                 "    #\"Normalizacja tekstu\" = Table.TransformColumns(Źródło, {{\"Technology\", Text.From, type text}}),",
                 "    #\"Usunięto inne kolumny\" = Table.SelectColumns(#\"Normalizacja tekstu\",{\"Technology\"}),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\", {\"Technology\"}),",
-                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Usunięto duplikaty\", each ([Technology] <> null and [Technology] <> \"\"))",
+                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Usunięto duplikaty\", each ([Technology] <> null and [Technology] <> \"\")),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Przefiltrowano wiersze\", \"Technology Pretty\", each if Text.Length([Technology]) <= 3 then Text.Upper([Technology])",
+                "else if List.Contains({\"Html\", \"Mysql\", \".Net\"}, [Technology])",
+                "then Text.Upper([Technology])",
+                "else Text.Proper([Technology])),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Technology Pretty\", type text}})",
                 "in",
-                "    #\"Przefiltrowano wiersze\""
+                "    #\"Changed Type\""
               ],
               "type": "m"
             }
