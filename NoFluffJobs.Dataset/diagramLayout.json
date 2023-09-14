@@ -4,8 +4,8 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 698.48851385959574,
-        "y": 75.118347397420408
+        "x": 309.33226747913977,
+        "y": 0
       },
       "nodes": [
         {
@@ -45,7 +45,7 @@
             "height": 200,
             "width": 234
           },
-          "zIndex": 12
+          "zIndex": 11
         },
         {
           "location": {
@@ -136,7 +136,7 @@
             "height": 124,
             "width": 159.59443799999985
           },
-          "zIndex": 13
+          "zIndex": 12
         },
         {
           "location": {
@@ -149,7 +149,7 @@
             "height": 124,
             "width": 234
           },
-          "zIndex": 11
+          "zIndex": 13
         },
         {
           "location": {
@@ -179,7 +179,7 @@
         }
       ],
       "name": "Wszystkie tabele",
-      "zoomValue": 89.192590520569411,
+      "zoomValue": 56.447393005377663,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,
