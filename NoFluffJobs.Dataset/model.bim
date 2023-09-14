@@ -1129,17 +1129,83 @@
             "lineageTag": "d5a7fd8b-cca6-4dd9-98d4-022cc36f0861"
           },
           {
-            "name": "% To previous level",
+            "name": "% of Average",
+            "expression": [
+              "",
+              "var techValue = SELECTEDVALUE('Technology DIM'[Technology], BLANK())",
+              "var categoryValue = SELECTEDVALUE('Tech category DIM'[Category], BLANK())",
+              "",
+              "var techTest = NOT ISBLANK(techValue)",
+              "var categoryTest = NOT ISBLANK(categoryValue)",
+              "",
+              "var avgSalaryFrom = [Salary AVG From]",
+              "var avgSalaryTo = [Salary AVG To]",
+              "",
+              "var categoryFrom = ROUND(CALCULATE([Salary AVG From], ",
+              "                            ALL('Technology DIM'), ",
+              "                            ALL('Jobs ID'[Company]))",
+              "                            ,0)",
+              "var categoryTo = ROUND(CALCULATE([Salary AVG To], ",
+              "                            ALL('Technology DIM'), ",
+              "                            ALL('Jobs ID'[Company]))",
+              "                            ,0)",
+              "",
+              "var totalFrom = CALCULATE([Average Category From], ALL('Tech category DIM'))",
+              "var totalTo = CALCULATE([Average Category To], ALL('Tech category DIM'))",
+              "",
+              "var technologyLevel = FORMAT(DIVIDE(avgSalaryFrom, categoryFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, categoryTo), \"Percent\")",
+              "var categoryLevel = FORMAT(DIVIDE(avgSalaryFrom, totalFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, totalTo), \"Percent\")",
+              "",
+              "var avgSalaryTest = NOT ISBLANK(avgSalaryFrom)",
+              "",
+              "var test = IF(techTest && avgSalaryTest, technologyLevel, IF(categoryTest && avgSalaryTest, categoryLevel))",
+              "return test"
+            ],
+            "lineageTag": "d30c7622-c4e9-412b-990d-b514252a70af"
+          },
+          {
+            "name": "Previous level",
             "expression": [
               "",
               "var techTest = NOT ISBLANK(SELECTEDVALUE('Technology DIM'[Technology], BLANK()))",
               "var categoryTest = NOT ISBLANK(SELECTEDVALUE('Tech category DIM'[Category], BLANK()))",
               "var avgSalary = NOT ISBLANK([Salary AVG From])",
-              "var test = IF(techTest && avgSalary, 0, IF(categoryTest && avgSalary, 1))",
+              "var test = IF(techTest && avgSalary, \"Category\", IF(categoryTest && avgSalary, \"Total\"))",
               "return test"
             ],
-            "formatString": "0",
-            "lineageTag": "d30c7622-c4e9-412b-990d-b514252a70af"
+            "lineageTag": "9f4444d8-8fc9-4c31-b611-9813c50747e8"
+          },
+          {
+            "name": "Average Category From",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "ROUND(CALCULATE([Salary AVG From], ",
+              "                            ALL('Technology DIM'), ",
+              "                            ALL('Jobs ID'[Company]))",
+              "                            ,0)"
+            ],
+            "lineageTag": "75d27cad-174d-4aaa-ba02-b80205945e4b"
+          },
+          {
+            "name": "Average Category To",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "ROUND(CALCULATE([Salary AVG To], ",
+              "                            ALL('Technology DIM'), ",
+              "                            ALL('Jobs ID'[Company]))",
+              "                            ,0)"
+            ],
+            "lineageTag": "81f7411f-dab7-4b23-aae9-f40bda1961c2"
           }
         ],
         "partitions": [
