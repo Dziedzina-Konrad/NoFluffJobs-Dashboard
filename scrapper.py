@@ -1,5 +1,5 @@
 import pandas as pd
-import requests,json, asyncio, aiohttp
+import requests,json, threading
 from bs4 import BeautifulSoup
 
 class NoFluffJobs():
@@ -14,13 +14,43 @@ class NoFluffJobs():
       req = requests.get(self.url)
       nfj_jobs = json.loads(req.text)
       nfj_jobs = nfj_jobs["postings"]
-      self.job_pages = []
+      self.job_pages = [] # List of company-title and url
+      self.unique_keys = []
+      self.unique_jobs = []
+      
       for job in nfj_jobs:
          job_key = job["name"].strip() + "--" + job["title"].strip()
          self.job_pages.append([job_key, self.job_url + job["url"]])
+         if job_key not in self.unique_keys:
+            self.unique_jobs.append([job_key, self.job_url + job["url"]])
+            self.unique_keys.append(job_key)
       self.mandatory_skills = []
       self.nice_to_have_skills = []
-
+   
+   
+   def job_scrapper_manager(self, jobs_to_download = 0, unique = True):
+      if unique:
+         pages = self.unique_jobs
+      else:
+         pages = self.job_pages
+         
+      if jobs_to_download != 0:
+         pages = pages[:jobs_to_download]
+         
+      cnt = 1
+      cnt_all = len(pages)
+      for job in pages:
+         print(f"Scraping data for: {job[1]} \t {cnt}/{cnt_all}")
+         mandatory, nice_to_have = self.get_job_skills(job[1])
+         mandatory_skills = [job[0], mandatory]
+         nice_to_have_skills = [job[0], nice_to_have]
+         if mandatory_skills not in self.mandatory_skills:
+            self.mandatory_skills.append([job[0], mandatory])
+         if nice_to_have_skills not in self.nice_to_have_skills:
+            self.nice_to_have_skills.append([job[0], nice_to_have])
+         cnt += 1
+            
+            
    def get_job_skills(self, link):
       """Get skills from nfj website that is passed as parametr link
 
@@ -50,23 +80,7 @@ class NoFluffJobs():
          print(f"No nice to have data for: {link}")
       return must_have_skills, nice_to_have_skills
    
-   def job_scrapper_manager(self, jobs_to_download = 0):
-      if jobs_to_download == 0:
-         pages = self.job_pages
-      else:
-         pages = self.job_pages[:jobs_to_download]
-         
-      for job in pages:
-         print(f"Scraping data for: {job[1]}")
-         mandatory, nice_to_have = self.get_job_skills(job[1])
-         mandatory_skills = [job[0], mandatory]
-         nice_to_have_skills = [job[0], nice_to_have]
-         if mandatory_skills not in self.mandatory_skills:
-            self.mandatory_skills.append([job[0], mandatory])
-         if nice_to_have_skills not in self.nice_to_have_skills:
-            self.nice_to_have_skills.append([job[0], nice_to_have])
-            
-            
+   
    def create_skills_df(self):
       self.mandatory_df = pd.DataFrame(self.mandatory_skills, columns=["company--title", "skill"])
       self.mandatory_df = self.mandatory_df.explode("skill")
