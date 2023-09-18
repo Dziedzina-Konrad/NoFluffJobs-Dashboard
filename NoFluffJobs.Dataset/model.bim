@@ -8,7 +8,7 @@
       },
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"posting\",\"Seniority\",\"Jobs ID\",\"Salary\",\"Location\",\"Tech\",\"_Measures\",\"Time\",\"Seniority DIM\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Tech category DIM\",\"Non Tech\"]"
+        "value": "[\"posting\",\"Seniority\",\"Jobs ID\",\"Salary\",\"Location\",\"Tech\",\"_Measures\",\"Time\",\"Seniority DIM\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Tech category DIM\",\"Non Tech\",\"Mandatory skills\",\"Optional skills\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",
@@ -61,6 +61,42 @@
         ],
         "kind": "m",
         "lineageTag": "94d9605b-d18d-4e4f-91e0-9abb568cdbcf"
+      },
+      {
+        "name": "Salary",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Źródło = posting,",
+          "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
+          "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
+          "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.salary\"),",
+          "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+          "    // Rozwiązanie tymczasowe, do zastąpienia po wdrożeniu przeliczników walutowych.",
+          "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
+          "if [Salary to] < 20000 then \"Up to 20.000\" else",
+          "if [Salary to] < 30000 then \"Up to 30.000\" else ",
+          "if [Salary to] < 40000 then \"Up to 40.000\" else",
+          "\"More then 40.000\"),",
+          "    #\"Dodano kolumnę niestandardową1\" = Table.AddColumn(#\"Dodano kolumnę niestandardową\", \"Category sort\", each if [Salary to] < 10000 then 0 else",
+          "if [Salary to] < 20000 then 1 else ",
+          "if [Salary to] < 30000 then 2 else ",
+          "if [Salary to] < 40000 then 3 else 4),",
+          "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}})",
+          "in",
+          "    #\"Zmieniono typ\""
+        ],
+        "kind": "m",
+        "lineageTag": "2398b632-36b0-4dfe-a987-e9ebdc5081c6"
       }
     ],
     "relationships": [
@@ -79,15 +115,6 @@
         "fromTable": "Tech",
         "toColumn": "ID",
         "toTable": "Jobs ID"
-      },
-      {
-        "name": "ab893ffc-5671-439c-9a38-272cedaaaceb",
-        "crossFilteringBehavior": "bothDirections",
-        "fromCardinality": "one",
-        "fromColumn": "ID",
-        "fromTable": "Jobs ID",
-        "toColumn": "ID",
-        "toTable": "Salary"
       },
       {
         "name": "434b8ace-a039-4bcc-933d-859f2c0b7bc4",
@@ -122,20 +149,6 @@
         "toTable": "Seniority DIM"
       },
       {
-        "name": "cc88e370-9a41-4118-b5b4-817237670bea",
-        "fromColumn": "Contract type",
-        "fromTable": "Salary",
-        "toColumn": "Contract type",
-        "toTable": "Contract types DIM"
-      },
-      {
-        "name": "eb022752-6ed2-4c9a-a874-cbd856e7c349",
-        "fromColumn": "Currency",
-        "fromTable": "Salary",
-        "toColumn": "Currency",
-        "toTable": "Currencies DIM"
-      },
-      {
         "name": "8bd92d1c-5362-445d-a8c7-cc05199788ed",
         "crossFilteringBehavior": "bothDirections",
         "fromColumn": "ID",
@@ -163,6 +176,20 @@
         "fromTable": "Tech",
         "toColumn": "Technology",
         "toTable": "Technology DIM"
+      },
+      {
+        "name": "5e7cc6cd-e340-48fb-a129-13adb64e07fc",
+        "fromColumn": "Currency",
+        "fromTable": "Jobs ID",
+        "toColumn": "Currency",
+        "toTable": "Currencies DIM"
+      },
+      {
+        "name": "a07e507b-9b2d-468d-a8c2-f96ac2779941",
+        "fromColumn": "Salary Type",
+        "fromTable": "Jobs ID",
+        "toColumn": "Contract",
+        "toTable": "Contract types DIM"
       }
     ],
     "sourceQueryCulture": "pl-PL",
@@ -443,6 +470,10 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
           }
         ],
         "columns": [
@@ -484,40 +515,9 @@
             "lineageTag": "73f47358-0e47-4a92-ba1f-4fb07651f2ec",
             "sourceColumn": "Title",
             "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
-        "partitions": [
+          },
           {
-            "name": "Jobs ID",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"name\", \"title\"}, {\"Column1.id\", \"Column1.name\", \"Column1.title\"}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1\"),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.name\", \"Company\"}, {\"Column1.title\", \"Title\"}}),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Company\", type text}, {\"Title\", type text}})",
-                "in",
-                "    #\"Zmieniono typ\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Salary",
-        "annotations": [
-          {
-            "name": "PBI_ResultType",
-            "value": "Table"
-          }
-        ],
-        "columns": [
-          {
-            "name": "ID",
+            "name": "company--title",
             "annotations": [
               {
                 "name": "SummarizationSetBy",
@@ -525,8 +525,8 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "3b84ea79-aed1-453e-b2fa-d784cc3d07d0",
-            "sourceColumn": "ID",
+            "lineageTag": "007687e2-816d-4c4e-bcbc-5d6a59cdcc51",
+            "sourceColumn": "company--title",
             "summarizeBy": "none"
           },
           {
@@ -539,7 +539,7 @@
             ],
             "dataType": "int64",
             "formatString": "0",
-            "lineageTag": "5609e67b-64be-4bbf-a97a-b6c4afc34552",
+            "lineageTag": "a4e0b089-d1cd-479f-8697-9c40113060ca",
             "sourceColumn": "Salary from",
             "summarizeBy": "sum"
           },
@@ -549,16 +549,20 @@
               {
                 "name": "SummarizationSetBy",
                 "value": "Automatic"
+              },
+              {
+                "name": "__PBI_SemanticLinks",
+                "value": "[{\"LinkTarget\":{\"TableName\":\"Jobs ID\",\"TableItemName\":\"Salary to (bins)\",\"ObjectType\":4},\"LinkType\":\"UsedInGroup\"}]"
               }
             ],
             "dataType": "int64",
             "formatString": "0",
-            "lineageTag": "d0e58840-597b-455c-82e6-1d81d69129dd",
+            "lineageTag": "d8fb4142-5b00-4926-bfc0-819feee6efdb",
             "sourceColumn": "Salary to",
             "summarizeBy": "sum"
           },
           {
-            "name": "Contract type",
+            "name": "Salary Type",
             "annotations": [
               {
                 "name": "SummarizationSetBy",
@@ -566,8 +570,8 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "6ee7252c-086c-4cea-9bbc-92da3c7c3df0",
-            "sourceColumn": "Contract type",
+            "lineageTag": "f08201e1-c248-45aa-a7a3-a7cc93b72eab",
+            "sourceColumn": "Salary Type",
             "summarizeBy": "none"
           },
           {
@@ -579,88 +583,17 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "e029223f-55d5-4b08-9fa2-fcfbad16d8b2",
+            "lineageTag": "9601d99c-9ad7-43a3-bbab-83e7869caae5",
             "sourceColumn": "Currency",
             "summarizeBy": "none"
           },
           {
-            "name": "Average",
+            "name": "Salary to (bins)",
             "annotations": [
               {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
+                "name": "GroupingDesignState",
+                "value": "{\"Version\":0,\"Sources\":[{\"Name\":\"j\",\"Entity\":\"Jobs ID\"}],\"GroupedColumns\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"j\"}},\"Property\":\"Salary to\"}}],\"BinItem\":{\"Expression\":{\"Floor\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"j\"}},\"Property\":\"Salary to\"}},\"Size\":10000.0}}}}"
               },
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
-            "dataType": "double",
-            "expression": "(Salary[Salary from] + Salary[Salary to]) / 2",
-            "isDataTypeInferred": true,
-            "lineageTag": "ec2980b2-eabc-4bf0-8076-3fe9f0ceae85",
-            "summarizeBy": "sum",
-            "type": "calculated"
-          },
-          {
-            "name": "Salary category",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "changedProperties": [
-              {
-                "property": "SortByColumn"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "56e4e2de-6a28-4a49-ae41-40553617f16c",
-            "sortByColumn": "Category sort",
-            "sourceColumn": "Salary category",
-            "summarizeBy": "none"
-          },
-          {
-            "name": "Category sort",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "int64",
-            "formatString": "0",
-            "lineageTag": "93dc71c4-c9a7-40ea-9a00-72e083b04936",
-            "sourceColumn": "Category sort",
-            "summarizeBy": "sum"
-          },
-          {
-            "name": "Column1",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              },
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
-            "dataType": "double",
-            "expression": [
-              "",
-              "// Calculate create new filter context over row context and because of one side of this table it looks like working in row context.",
-              "CALCULATE(AVERAGEX(Salary, (Salary[Salary from] + Salary[Salary to]) / 2))"
-            ],
-            "isDataTypeInferred": true,
-            "lineageTag": "f4eed67b-7aa9-42c2-b474-324c483a4d55",
-            "summarizeBy": "sum",
-            "type": "calculated"
-          },
-          {
-            "name": "cnt",
-            "annotations": [
               {
                 "name": "SummarizationSetBy",
                 "value": "Automatic"
@@ -668,86 +601,63 @@
             ],
             "dataType": "int64",
             "expression": [
-              "",
-              "// Both filter are applyed, from contex transition and from 1 parametr",
-              "CALCULATE(COUNTX(Salary,Salary[Salary from]), Salary[Contract type] == \"b2b\")"
+              "IF(",
+              "\tISBLANK('Jobs ID'[Salary to]),",
+              "\tBLANK(),",
+              "\tINT('Jobs ID'[Salary to] / 10000) * 10000",
+              ")"
+            ],
+            "extendedProperties": [
+              {
+                "name": "GroupingMetadata",
+                "type": "json",
+                "value": {
+                  "binningMetadata": {
+                    "binSize": {
+                      "unit": 0,
+                      "value": 10000.0
+                    }
+                  },
+                  "groupedColumns": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "Jobs ID"
+                          }
+                        },
+                        "Property": "Salary to"
+                      }
+                    }
+                  ],
+                  "version": 0
+                }
+              }
             ],
             "formatString": "0",
             "isDataTypeInferred": true,
-            "lineageTag": "91ab2c78-6323-453d-863c-80d2901c73ba",
-            "summarizeBy": "sum",
-            "type": "calculated"
-          },
-          {
-            "name": "Column",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              },
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
-            "dataType": "double",
-            "expression": [
-              "",
-              "// New row contex that itterate over table without outer context",
-              "AVERAGEX(Salary, (Salary[Salary from] + Salary[Salary to]) / 2)"
-            ],
-            "isDataTypeInferred": true,
-            "lineageTag": "6716d6e4-7e01-41e5-83ec-4901183d002b",
-            "summarizeBy": "sum",
-            "type": "calculated"
-          },
-          {
-            "name": "cnt2",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "int64",
-            "expression": [
-              "",
-              "// Now filter overwriting transition context and return all b2b rows in table to count ",
-              "CALCULATE(COUNTX(Salary,Salary[Salary from]), FILTER(Salary,Salary[Contract type] == \"b2b\"))"
-            ],
-            "formatString": "0",
-            "isDataTypeInferred": true,
-            "lineageTag": "0dc162d6-ad4a-4425-be2b-2d4a0b5648d7",
-            "summarizeBy": "sum",
+            "lineageTag": "570dbfcd-7a8a-4629-a40d-8697a3111acd",
+            "summarizeBy": "none",
             "type": "calculated"
           }
         ],
-        "lineageTag": "587f45cd-0f38-4a9e-8719-7240f8fd3e24",
+        "lineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
         "partitions": [
           {
-            "name": "Salary",
+            "name": "Jobs ID",
             "mode": "import",
             "source": {
               "expression": [
                 "let",
                 "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
-                "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.salary\"),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
-                "    // Rozwiązanie tymczasowe, do zastąpienia po wdrożeniu przeliczników walutowych.",
-                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
-                "if [Salary to] < 20000 then \"Up to 20.000\" else",
-                "if [Salary to] < 30000 then \"Up to 30.000\" else ",
-                "if [Salary to] < 40000 then \"Up to 40.000\" else",
-                "\"More then 40.000\"),",
-                "    #\"Dodano kolumnę niestandardową1\" = Table.AddColumn(#\"Dodano kolumnę niestandardową\", \"Category sort\", each if [Salary to] < 10000 then 0 else",
-                "if [Salary to] < 20000 then 1 else ",
-                "if [Salary to] < 30000 then 2 else ",
-                "if [Salary to] < 40000 then 3 else 4),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}})",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"name\", \"salary\", \"title\"}, {\"Column1.id\", \"Column1.name\", \"Column1.salary\", \"Column1.title\"}),",
+                "    #\"Expanded Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Expanded Column1.salary\",{{\"Column1.id\", \"ID\"}, {\"Column1.name\", \"Company\"}, {\"Column1.title\", \"Title\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Salary Type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Company\", type text}, {\"Title\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Salary Type\", type text}, {\"Currency\", type text}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono typ\", \"company--title\", each [Company] & \"--\" & [Title]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"company--title\", type text}})",
                 "in",
-                "    #\"Zmieniono typ\""
+                "    #\"Changed Type\""
               ],
               "type": "m"
             }
@@ -905,9 +815,9 @@
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
-              "var sumMin = SUM(Salary[Salary from])",
-              "var sumMax = SUM(Salary[Salary to])",
-              "var countSalaryRows = COUNTROWS(Salary)",
+              "var sumMin = SUM('Jobs ID'[Salary from])",
+              "var sumMax = SUM('Jobs ID'[Salary to])",
+              "var countSalaryRows = COUNTROWS('Jobs ID')",
               "var averageSalary = (sumMax + sumMin) / (countSalaryRows * 2)",
               "var valueToReturn = IF(",
               "    ISBLANK(averageSalary),",
@@ -1060,7 +970,7 @@
                 "value": "{\"isDecimal\":true}"
               }
             ],
-            "expression": "AVERAGE(Salary[Salary from])",
+            "expression": "AVERAGE('Jobs ID'[Salary from])",
             "formatString": "0",
             "lineageTag": "12f85278-4d21-49ab-a9ba-61d3eca65ba5"
           },
@@ -1072,7 +982,7 @@
                 "value": "{\"isDecimal\":true}"
               }
             ],
-            "expression": "AVERAGE(Salary[Salary to])",
+            "expression": "AVERAGE('Jobs ID'[Salary to])",
             "formatString": "0",
             "lineageTag": "c471103c-b722-46f5-aaca-758296e8d696"
           },
@@ -1206,6 +1116,12 @@
               "                            ,0)"
             ],
             "lineageTag": "81f7411f-dab7-4b23-aae9-f40bda1961c2"
+          },
+          {
+            "name": "Distinct jobs",
+            "expression": "DISTINCTCOUNT('Jobs ID'[company--title])",
+            "formatString": "0",
+            "lineageTag": "3a4a9e18-d2af-4e15-96cf-4d7c418e2414"
           }
         ],
         "partitions": [
@@ -2262,6 +2178,122 @@
                 "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] = null or [Technology] = \"\"))",
                 "in",
                 "    #\"Przefiltrowano wiersze\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Mandatory skills",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Company--title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "8c8161ba-7442-484c-a50f-ed7d39099b1d",
+            "sourceColumn": "Company--title",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Skill",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "fc04bb67-93ef-433f-bba2-eb245523c26f",
+            "sourceColumn": "Skill",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "edec3e85-f181-4fe9-b4b3-7545dd6da270",
+        "partitions": [
+          {
+            "name": "Mandatory skills",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(\"C:\\Users\\dzied\\OneDrive\\Desktop\\NoFluffJobs\\mandatory_skills.csv\"),[Delimiter=\";\", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])",
+                "in",
+                "    #\"Promoted Headers\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Optional skills",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Company--title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "a9953a4b-a878-4524-8e6e-bb632de0b219",
+            "sourceColumn": "Company--title",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Skill",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "001ee9cc-3c5d-4426-aeb5-9894424cdb01",
+            "sourceColumn": "Skill",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "bb50cda8-779e-4fdd-b32b-b42e364823e5",
+        "partitions": [
+          {
+            "name": "Optional skills",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(\"C:\\Users\\dzied\\OneDrive\\Desktop\\NoFluffJobs\\optional_skills.csv\"),[Delimiter=\";\", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])",
+                "in",
+                "    #\"Promoted Headers\""
               ],
               "type": "m"
             }

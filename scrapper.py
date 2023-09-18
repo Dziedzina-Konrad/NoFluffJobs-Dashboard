@@ -1,6 +1,5 @@
-import time
 import pandas as pd
-import requests,json, threading
+import requests,json
 from bs4 import BeautifulSoup
 
 class NoFluffJobs():
@@ -15,10 +14,12 @@ class NoFluffJobs():
       req = requests.get(self.url)
       nfj_jobs = json.loads(req.text)
       nfj_jobs = nfj_jobs["postings"]
+      self.mandatory_df = pd.DataFrame(columns=["Company--title", "Skill"])
+      self.nice_to_have_df =  pd.DataFrame(columns=["Company--title", "Skill"])
       self.job_pages = [] # List of company-title and url
-      self.unique_keys = []
-      self.unique_jobs = []
-      self.loaded_keys = []
+      self.unique_keys = [] # List of list unique company--title keyand links 
+      self.unique_jobs = [] # List of unique company--title 
+      self.non_working_urls = []
       
       for job in nfj_jobs:
          job_key = job["name"].strip() + "--" + job["title"].strip()
@@ -52,7 +53,7 @@ class NoFluffJobs():
       for job in pages:
          # Check if data are loaded.
          
-         has_data = job[0] in self.loaded_keys
+         has_data = job[0] in self.mandatory_df["Company--title"].values
          if has_data & skip_loaded_data:
             print(f"Skipped {job[0]} data")
             cnt += 1
@@ -75,6 +76,7 @@ class NoFluffJobs():
             self.skills_to_csv("test\\mandatory_safe_point.csv", "test\\optional_safe_point.csv")
             print("Saved data")
          cnt += 1
+      for url in self.non_working_urls: print(f"Non working url: {url}")
             
             
    def get_job_skills(self, link):
@@ -95,12 +97,8 @@ class NoFluffJobs():
          for skill in skill_elements:
             must_have_skills.append(skill.text.strip())
       except:
-         print(soup.find_all("li"))
-         time.sleep(10)
-         soup = BeautifulSoup(requests.get(link).text, "html5lib")
-         must_have_section = soup.find("section", class_="d-block")
-         for skill in must_have_section.find_all("li"):
-            must_have_skills.append(skill.text.strip())
+         self.non_working_urls.append(link)
+         print(f"Non working link: {link}")
       nice_to_have_skills = []
       try:
          nice_to_have_section = soup.find("section" , class_="d-block mt-3 ng-star-inserted")
@@ -112,11 +110,23 @@ class NoFluffJobs():
    
    
    def create_skills_df(self):
-      self.mandatory_df = pd.DataFrame(self.mandatory_skills, columns=["company--title", "skill"])
-      self.mandatory_df = self.mandatory_df.explode("skill")
-      self.nice_to_have_df = pd.DataFrame(self.nice_to_have_skills, columns=["company--title", "skill"])
-      self.nice_to_have_df = self.nice_to_have_df.explode("skill")
-      
+      for data in self.mandatory_skills:
+         # Tworzenie DataFrame dla każdej pary i dodanie go do listy
+         temp_df = pd.DataFrame({
+            'Company--title': [data[0]] * len(data[1]),
+            'Skill': data[1]
+         })
+         self.mandatory_df = pd.concat([self.mandatory_df, temp_df])
+         
+         
+      for data in self.nice_to_have_skills:
+         # Tworzenie DataFrame dla każdej pary i dodanie go do listy
+         temp_df = pd.DataFrame({
+            'Company--title': [data[0]] * len(data[1]),
+            'Skill': data[1]
+         })
+         self.nice_to_have_df = pd.concat([self.nice_to_have_df, temp_df])
+         
       
    def skills_to_csv(self, mandatory_csv = "mandatory_skills.csv", nice_to_have_csv = "optional_skills.csv", separator= ";"):
       """Saving data of skills to files.
@@ -126,27 +136,14 @@ class NoFluffJobs():
           nice_to_have_csv (str, optional): file name gor optional/nice to have datarframe. Defaults to "optional_skills.csv".
           separator (str, optional): Seperator that is used for creating files. Defaults to ";".
       """
-      self.mandatory_df.to_csv(mandatory_csv, sep=separator)
-      self.nice_to_have_df.to_csv(nice_to_have_csv,sep=separator)
+      self.mandatory_df.to_csv(mandatory_csv, sep=separator, index=False)
+      self.nice_to_have_df.to_csv(nice_to_have_csv,sep=separator, index=False)
    
    
    def load_saved_files(self, mandatory_csv="test\\mandatory_safe_point.csv", nice_to_have_csv="test\\optional_safe_point.csv", sep=";"):
-      print("Loading mandatory data.")
       mandatory = pd.read_csv(mandatory_csv, sep=sep , index_col = False)
-      mandatory = mandatory.groupby("company--title").agg({"skill":list})
-      mandatory_array = []
-      for row in mandatory.iterrows():
-         row_one = row[1].values.tolist()
-         print(row_one)
-         mandatory_array.append([row[0], row_one])
-         self.loaded_keys.append(row[0])
-      self.mandatory_skills = mandatory_array
-      
+      self.mandatory_df = pd.concat([self.mandatory_df, mandatory])
       print("Loading nice to have data.")
-      optional = pd.read_csv(nice_to_have_csv, sep=sep , index_col = False)
-      optional = optional.groupby("company--title").agg({"skill":list})
-      optional_array = []
-      for row in optional.iterrows():
-         optional_array.append([row[0], row[1]])
-      self.nice_to_have_skills = optional_array
+      nice_to_have = pd.read_csv(nice_to_have_csv, sep=sep , index_col = False)
+      self.nice_to_have_df = pd.concat([nice_to_have, self.nice_to_have_df])
       print("Loading saved files completed.")

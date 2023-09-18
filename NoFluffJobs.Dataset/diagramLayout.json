@@ -4,14 +4,14 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
-        "y": 0
+        "x": 216.16525036178246,
+        "y": 17.381112634073187
       },
       "nodes": [
         {
           "location": {
-            "x": 0,
-            "y": 228.5313690000003
+            "x": 428.20741125762117,
+            "y": 31.018725430986848
           },
           "nodeIndex": "Seniority",
           "nodeLineageTag": "55a3dd63-9689-4081-aab1-013a45461e3d",
@@ -23,29 +23,16 @@
         },
         {
           "location": {
-            "x": 1020.6429400000013,
-            "y": 0
+            "x": 936.89757912673974,
+            "y": 442.42832159459022
           },
           "nodeIndex": "Jobs ID",
           "nodeLineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
           "size": {
-            "height": 152,
+            "height": 286.30859762692916,
             "width": 234
           },
           "zIndex": 4
-        },
-        {
-          "location": {
-            "x": 412.10263199999974,
-            "y": 221.094976
-          },
-          "nodeIndex": "Salary",
-          "nodeLineageTag": "587f45cd-0f38-4a9e-8719-7240f8fd3e24",
-          "size": {
-            "height": 200,
-            "width": 234
-          },
-          "zIndex": 11
         },
         {
           "location": {
@@ -62,8 +49,8 @@
         },
         {
           "location": {
-            "x": 1330.9115663655464,
-            "y": 233.47630834825677
+            "x": 920.08526774199845,
+            "y": 0
           },
           "nodeIndex": "Time",
           "nodeLineageTag": "b603d561-31da-4cf5-96af-43d39ce367ab",
@@ -71,12 +58,12 @@
             "height": 248,
             "width": 234
           },
-          "zIndex": 6
+          "zIndex": 12
         },
         {
           "location": {
-            "x": 0,
-            "y": 790.86753765276092
+            "x": 28.44182067393794,
+            "y": 0
           },
           "nodeIndex": "Seniority DIM",
           "nodeLineageTag": "e115afc2-cc90-4aac-bd8a-0c6a4f4a4a9f",
@@ -84,12 +71,12 @@
             "height": 128,
             "width": 184.39629199999996
           },
-          "zIndex": 7
+          "zIndex": 6
         },
         {
           "location": {
-            "x": 556.64130524082839,
-            "y": 793.04436997166817
+            "x": 1547.364725383,
+            "y": 571.83020917437307
           },
           "nodeIndex": "Contract types DIM",
           "nodeLineageTag": "972d004e-56f1-47db-a286-349c9c7cfc06",
@@ -97,12 +84,12 @@
             "height": 124,
             "width": 161.36599899999987
           },
-          "zIndex": 8
+          "zIndex": 14
         },
         {
           "location": {
-            "x": 358.95653412432154,
-            "y": 792.70364994717852
+            "x": 1534.5517886470898,
+            "y": 772.16233501600118
           },
           "nodeIndex": "Currencies DIM",
           "nodeLineageTag": "610afe22-4acd-4036-b03a-25925e1b6127",
@@ -110,12 +97,12 @@
             "height": 124,
             "width": 175.53848699999992
           },
-          "zIndex": 9
+          "zIndex": 7
         },
         {
           "location": {
-            "x": 1637.1630588488295,
-            "y": 238.51778114021954
+            "x": 1471.2524382508582,
+            "y": 0
           },
           "nodeIndex": "Location",
           "nodeLineageTag": "c4c40b8b-0a1e-4c4c-b970-0c73fca85efe",
@@ -127,8 +114,8 @@
         },
         {
           "location": {
-            "x": 1145.7527026819566,
-            "y": 667.53310150367759
+            "x": 1166.294017613134,
+            "y": 1070.4588943844651
           },
           "nodeIndex": "Tech category DIM",
           "nodeLineageTag": "a4f9a030-9a5a-43ae-91d4-c857fc062ab0",
@@ -136,12 +123,12 @@
             "height": 124,
             "width": 159.59443799999985
           },
-          "zIndex": 12
+          "zIndex": 8
         },
         {
           "location": {
-            "x": 838.22156495483785,
-            "y": 681.80007670293776
+            "x": 757.63640637868036,
+            "y": 1073.6651615438604
           },
           "nodeIndex": "Technology DIM",
           "nodeLineageTag": "7a09890e-b7b6-4a67-8c8f-594b37271e6a",
@@ -149,12 +136,12 @@
             "height": 124,
             "width": 234
           },
-          "zIndex": 13
+          "zIndex": 9
         },
         {
           "location": {
-            "x": 975.16585160187481,
-            "y": 245.75593063840665
+            "x": 927.7628171453116,
+            "y": 841.45406364255132
           },
           "nodeIndex": "Tech",
           "nodeLineageTag": "3a0ea90f-19e9-47e1-9d2a-9f0f4ddf30c6",
@@ -162,12 +149,12 @@
             "height": 176,
             "width": 234
           },
-          "zIndex": 1
+          "zIndex": 11
         },
         {
           "location": {
-            "x": 1932.5108804791428,
-            "y": 239.06829908706447
+            "x": 1474.2815473990315,
+            "y": 322.81365996032622
           },
           "nodeIndex": "Non Tech",
           "nodeLineageTag": "7bafa4bf-d6b5-4143-81dd-b152f9c3bd13",
@@ -175,11 +162,37 @@
             "height": 176,
             "width": 234
           },
+          "zIndex": 13
+        },
+        {
+          "location": {
+            "x": 2328.1972492222831,
+            "y": 520.35408050000069
+          },
+          "nodeIndex": "Mandatory skills",
+          "nodeLineageTag": "edec3e85-f181-4fe9-b4b3-7545dd6da270",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 2612.1972492222831,
+            "y": 520.35408050000069
+          },
+          "nodeIndex": "Optional skills",
+          "nodeLineageTag": "bb50cda8-779e-4fdd-b32b-b42e364823e5",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
           "zIndex": 2
         }
       ],
       "name": "Wszystkie tabele",
-      "zoomValue": 56.447393005377663,
+      "zoomValue": 63.287087723233967,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,
