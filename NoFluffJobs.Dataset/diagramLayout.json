@@ -4,27 +4,14 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 1.5801011485521081,
-        "y": 3.1602022971042163
+        "x": 210.8157590000003,
+        "y": 0
       },
       "nodes": [
         {
           "location": {
-            "x": 428.20741125762117,
-            "y": 31.018725430986848
-          },
-          "nodeIndex": "Seniority",
-          "nodeLineageTag": "55a3dd63-9689-4081-aab1-013a45461e3d",
-          "size": {
-            "height": 128,
-            "width": 234
-          },
-          "zIndex": 5
-        },
-        {
-          "location": {
-            "x": 936.89757912673974,
-            "y": 442.42832159459022
+            "x": 949.29850612673977,
+            "y": 288.30251459459
           },
           "nodeIndex": "Jobs ID",
           "nodeLineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
@@ -32,12 +19,12 @@
             "height": 286.30859762692916,
             "width": 234
           },
-          "zIndex": 6
+          "zIndex": 11
         },
         {
           "location": {
-            "x": 2044.1972492222831,
-            "y": 1064.7081610000014
+            "x": 2165.3566643365671,
+            "y": 17.970263209385166
           },
           "nodeIndex": "_Measures",
           "nodeLineageTag": "9c6f3896-b824-4110-a225-e78fe0a91a23",
@@ -45,11 +32,11 @@
             "height": 104,
             "width": 234
           },
-          "zIndex": 7
+          "zIndex": 6
         },
         {
           "location": {
-            "x": 920.08526774199845,
+            "x": 362.0435527419977,
             "y": 0
           },
           "nodeIndex": "Time",
@@ -58,25 +45,25 @@
             "height": 248,
             "width": 234
           },
-          "zIndex": 13
+          "zIndex": 9
         },
         {
           "location": {
-            "x": 28.44182067393794,
-            "y": 0
+            "x": 469.65178595446554,
+            "y": 380.34744773202414
           },
           "nodeIndex": "Seniority DIM",
-          "nodeLineageTag": "e115afc2-cc90-4aac-bd8a-0c6a4f4a4a9f",
+          "nodeLineageTag": "55a3dd63-9689-4081-aab1-013a45461e3d",
           "size": {
             "height": 128,
-            "width": 184.39629199999996
+            "width": 234
           },
-          "zIndex": 8
+          "zIndex": 7
         },
         {
           "location": {
-            "x": 1547.364725383,
-            "y": 571.83020917437307
+            "x": 1784.4527576223163,
+            "y": 277.86379448727786
           },
           "nodeIndex": "Contract types DIM",
           "nodeLineageTag": "972d004e-56f1-47db-a286-349c9c7cfc06",
@@ -84,12 +71,12 @@
             "height": 157.18212411959416,
             "width": 279.87358514140783
           },
-          "zIndex": 14
+          "zIndex": 10
         },
         {
           "location": {
-            "x": 1534.5517886470898,
-            "y": 772.16233501600118
+            "x": 1842.5478626287227,
+            "y": 576.07918318778968
           },
           "nodeIndex": "Currencies DIM",
           "nodeLineageTag": "610afe22-4acd-4036-b03a-25925e1b6127",
@@ -97,25 +84,12 @@
             "height": 124,
             "width": 175.53848699999992
           },
-          "zIndex": 9
+          "zIndex": 8
         },
         {
           "location": {
-            "x": 1166.294017613134,
-            "y": 1070.4588943844651
-          },
-          "nodeIndex": "Tech category DIM",
-          "nodeLineageTag": "a4f9a030-9a5a-43ae-91d4-c857fc062ab0",
-          "size": {
-            "height": 124,
-            "width": 159.59443799999985
-          },
-          "zIndex": 10
-        },
-        {
-          "location": {
-            "x": 757.63640637868036,
-            "y": 1073.6651615438604
+            "x": 460.36104908493405,
+            "y": 880.73429297473467
           },
           "nodeIndex": "Technology DIM",
           "nodeLineageTag": "7a09890e-b7b6-4a67-8c8f-594b37271e6a",
@@ -123,41 +97,15 @@
             "height": 124,
             "width": 234
           },
-          "zIndex": 11
+          "zIndex": 13
         },
         {
           "location": {
-            "x": 927.7628171453116,
-            "y": 841.45406364255132
-          },
-          "nodeIndex": "Tech",
-          "nodeLineageTag": "3a0ea90f-19e9-47e1-9d2a-9f0f4ddf30c6",
-          "size": {
-            "height": 176,
-            "width": 234
-          },
-          "zIndex": 12
-        },
-        {
-          "location": {
-            "x": 2328.1972492222831,
-            "y": 520.35408050000069
+            "x": 1671.8473715322802,
+            "y": 999.32680033662393
           },
           "nodeIndex": "Mandatory skills",
           "nodeLineageTag": "edec3e85-f181-4fe9-b4b3-7545dd6da270",
-          "size": {
-            "height": 128,
-            "width": 234
-          },
-          "zIndex": 3
-        },
-        {
-          "location": {
-            "x": 2612.1972492222831,
-            "y": 520.35408050000069
-          },
-          "nodeIndex": "Optional skills",
-          "nodeLineageTag": "bb50cda8-779e-4fdd-b32b-b42e364823e5",
           "size": {
             "height": 128,
             "width": 234
@@ -166,28 +114,16 @@
         },
         {
           "location": {
-            "x": 1474.2815473990315,
-            "y": 322.81365996032622
+            "x": 1667.9343529572607,
+            "y": 757.05183011580311
           },
-          "nodeIndex": "Non Tech DIM",
-          "size": {
-            "height": 176,
-            "width": 234
-          },
-          "zIndex": 1
-        },
-        {
-          "location": {
-            "x": 2867.7554285483452,
-            "y": 534.83258077193022
-          },
-          "nodeIndex": "Non Tech Flavors DIM",
-          "nodeLineageTag": "a42ff0b3-a5e6-4ae7-ba29-d83ba71d413e",
+          "nodeIndex": "Optional skills",
+          "nodeLineageTag": "bb50cda8-779e-4fdd-b32b-b42e364823e5",
           "size": {
             "height": 128,
             "width": 234
           },
-          "zIndex": 2
+          "zIndex": 5
         },
         {
           "location": {
@@ -200,11 +136,63 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 460.27243904353759,
+            "y": 612.33911556743271
+          },
+          "nodeIndex": "Category DIM",
+          "nodeLineageTag": "43005b75-be40-4b5b-b374-b9f0419d5423",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 1360.0914602516325,
+            "y": 396.26015566831188
+          },
+          "nodeIndex": "Salary DIM",
+          "nodeLineageTag": "4b037ce1-de96-4a9f-accd-2d110edb9f11",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1359.2015405945685,
+            "y": 868.54901516831239
+          },
+          "nodeIndex": "Unique Jobs DIM",
+          "nodeLineageTag": "13c156a6-7076-4f7f-85ea-1dbaf3b5b463",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 455.70543059456713,
+            "y": 1126.3950671683128
+          },
+          "nodeIndex": "Job Group",
+          "nodeLineageTag": "03e4aed3-566d-42b8-adc0-82a89282114a",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 14
         }
       ],
       "name": "Wszystkie tabele",
-      "zoomValue": 63.287087723233959,
+      "zoomValue": 56.447393005377663,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

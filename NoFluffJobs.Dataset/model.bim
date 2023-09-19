@@ -8,7 +8,7 @@
       },
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"posting\",\"Seniority\",\"Jobs ID\",\"Salary\",\"Tech\",\"_Measures\",\"Time\",\"Non Tech DIM\",\"Mandatory skills\",\"Optional skills\",\"Seniority DIM\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Tech category DIM\",\"Non Tech Flavors DIM\",\"Location DIM\"]"
+        "value": "[\"Salary DIM\",\"Tech\",\"posting\",\"Jobs ID\",\"_Measures\",\"Time\",\"Mandatory skills\",\"Optional skills\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Location DIM\",\"Seniority DIM\",\"Category DIM\",\"Unique Jobs DIM\",\"Job Group\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",
@@ -63,7 +63,7 @@
         "lineageTag": "94d9605b-d18d-4e4f-91e0-9abb568cdbcf"
       },
       {
-        "name": "Salary",
+        "name": "Tech",
         "annotations": [
           {
             "name": "PBI_NavigationStepName",
@@ -77,26 +77,19 @@
         "expression": [
           "let",
           "    Źródło = posting,",
-          "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
-          "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
-          "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Rozwinięty element Column1.salary\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
-          "    // Rozwiązanie tymczasowe, do zastąpienia po wdrożeniu przeliczników walutowych.",
-          "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
-          "if [Salary to] < 20000 then \"Up to 20.000\" else",
-          "if [Salary to] < 30000 then \"Up to 30.000\" else ",
-          "if [Salary to] < 40000 then \"Up to 40.000\" else",
-          "\"More then 40.000\"),",
-          "    #\"Dodano kolumnę niestandardową1\" = Table.AddColumn(#\"Dodano kolumnę niestandardową\", \"Category sort\", each if [Salary to] < 10000 then 0 else",
-          "if [Salary to] < 20000 then 1 else ",
-          "if [Salary to] < 30000 then 2 else ",
-          "if [Salary to] < 40000 then 3 else 4),",
-          "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}}),",
-          "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Zmieniono typ\")",
+          "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"technology\", \"category\", \"flavors\"}, {\"Column1.id\", \"Column1.technology\", \"Column1.category\", \"Column1.flavors\"}),",
+          "    #\"Rozwinięty element Column1.flavors\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.flavors\"),",
+          "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.flavors\"),",
+          "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}, {\"Column1.flavors\", \"Flavors\"}}),",
+          "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Technology\", type text}, {\"Category\", type text}, {\"Flavors\", type text}}),",
+          "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
+          "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
+          "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}})",
           "in",
-          "    #\"Usunięto duplikaty\""
+          "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\""
         ],
         "kind": "m",
-        "lineageTag": "2398b632-36b0-4dfe-a987-e9ebdc5081c6"
+        "lineageTag": "0e0e98e2-5ea7-4db4-aefa-bde826fc1103"
       }
     ],
     "relationships": [
@@ -117,46 +110,78 @@
         "toTable": "LocalDateTable_815af6cc-39a4-42fc-a4c4-2fd311b72361"
       },
       {
-        "name": "8b0d98ce-5953-4b17-945c-36ca95489a7b",
-        "fromColumn": "Seniorty",
-        "fromTable": "Seniority",
+        "name": "1da910e1-4afe-4080-aa18-f1488a6c3c61",
+        "fromColumn": "Seniority",
+        "fromTable": "Jobs ID",
         "toColumn": "Seniorty",
         "toTable": "Seniority DIM"
       },
       {
-        "name": "11f7f545-d42f-42f6-b1d5-ebd1c580eb6a",
+        "name": "4b7f55fc-b6ad-4c1a-952f-85ce23ebe229",
         "fromColumn": "Category",
-        "fromTable": "Tech",
-        "toColumn": "Category",
-        "toTable": "Tech category DIM"
-      },
-      {
-        "name": "71b1fbd3-ae37-478d-994c-d074f5867486",
-        "fromColumn": "Technology",
-        "fromTable": "Tech",
-        "toColumn": "Technology",
-        "toTable": "Technology DIM"
-      },
-      {
-        "name": "5e7cc6cd-e340-48fb-a129-13adb64e07fc",
-        "fromColumn": "Currency",
         "fromTable": "Jobs ID",
+        "toColumn": "Category",
+        "toTable": "Category DIM"
+      },
+      {
+        "name": "36974e3a-7b8f-4f6f-b292-3c42ad6d1888",
+        "fromColumn": "Currency",
+        "fromTable": "Salary DIM",
         "toColumn": "Currency",
         "toTable": "Currencies DIM"
       },
       {
-        "name": "a07e507b-9b2d-468d-a8c2-f96ac2779941",
-        "fromColumn": "Salary Type",
-        "fromTable": "Jobs ID",
-        "toColumn": "Contract",
+        "name": "b3826663-365c-4922-b5ff-9b5cfb466fc6",
+        "fromColumn": "Contract type",
+        "fromTable": "Salary DIM",
+        "toColumn": "Contract type",
         "toTable": "Contract types DIM"
       },
       {
-        "name": "759a5309-8065-43db-8f7d-2051cd118ef9",
-        "fromColumn": "Category",
-        "fromTable": "Non Tech Flavors DIM",
-        "toColumn": "Category",
-        "toTable": "Tech category DIM"
+        "name": "3d2ba6c6-9824-4297-8de4-e74d352f9571",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "ID",
+        "fromTable": "Jobs ID",
+        "toColumn": "ID",
+        "toTable": "Salary DIM"
+      },
+      {
+        "name": "85775422-22b4-495c-b570-6ba7019ba9c3",
+        "fromColumn": "Technology",
+        "fromTable": "Jobs ID",
+        "toColumn": "Technology",
+        "toTable": "Technology DIM"
+      },
+      {
+        "name": "d3c1c413-e472-44ac-8872-205d504f14cc",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "company--title",
+        "fromTable": "Jobs ID",
+        "toColumn": "Company--title",
+        "toTable": "Unique Jobs DIM"
+      },
+      {
+        "name": "fa226cc4-a2dd-4866-acd6-13caa6094310",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "Company--title",
+        "fromTable": "Optional skills",
+        "toColumn": "Company--title",
+        "toTable": "Unique Jobs DIM"
+      },
+      {
+        "name": "d4c26a3f-78cd-4977-ad21-13616412950e",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "Company--title",
+        "fromTable": "Mandatory skills",
+        "toColumn": "Company--title",
+        "toTable": "Unique Jobs DIM"
+      },
+      {
+        "name": "0c55951a-7225-44a4-8aba-5142264a974a",
+        "fromColumn": "Group",
+        "fromTable": "Jobs ID",
+        "toColumn": "Group",
+        "toTable": "Job Group"
       }
     ],
     "sourceQueryCulture": "pl-PL",
@@ -374,27 +399,14 @@
         ]
       },
       {
-        "name": "Seniority",
+        "name": "Seniority DIM",
         "annotations": [
           {
             "name": "PBI_ResultType",
-            "value": "Exception"
+            "value": "Table"
           }
         ],
         "columns": [
-          {
-            "name": "ID",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "bf9c5c37-a3a9-427e-bc6b-5454efa6e1f3",
-            "sourceColumn": "ID",
-            "summarizeBy": "none"
-          },
           {
             "name": "Seniorty",
             "annotations": [
@@ -403,28 +415,54 @@
                 "value": "Automatic"
               }
             ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
             "dataType": "string",
             "lineageTag": "72a33760-46e3-4d98-b885-50e15fa03a69",
+            "sortByColumn": "Seniority Order",
             "sourceColumn": "Seniorty",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Seniority Order",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6114e4c2-a3ec-453b-95eb-7dabe70147fe",
+            "sourceColumn": "Seniority Order",
             "summarizeBy": "none"
           }
         ],
         "lineageTag": "55a3dd63-9689-4081-aab1-013a45461e3d",
         "partitions": [
           {
-            "name": "Seniority",
+            "name": "Seniority DIM",
             "mode": "import",
             "source": {
               "expression": [
                 "let",
                 "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"seniority\"}, {\"Column1.id\", \"Column1.seniority\"}),",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", { \"seniority\"}, { \"Column1.seniority\"}),",
                 "    #\"Rozwinięty element Column1.seniority\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.seniority\"),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.seniority\"),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.id\", type text}, {\"Column1.seniority\", type text}}),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.id\", \"ID\"}, {\"Column1.seniority\", \"Seniorty\"}})",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.seniority\", type text}}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.seniority\", \"Seniorty\"}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Seniority Order\", each if [Seniorty] = \"Trainee\" then 0 ",
+                "else if [Seniorty] = \"Junior\" then 1 ",
+                "else if [Seniorty] = \"Mid\" then 2 ",
+                "else if [Seniorty] = \"Senior\" then 3 ",
+                "else 4),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Seniority Order\", Int64.Type}})",
                 "in",
-                "    #\"Zmieniono nazwy kolumn\""
+                "    #\"Changed Type\""
               ],
               "type": "m"
             }
@@ -619,61 +657,9 @@
             "lineageTag": "e6285e77-c182-40b9-9475-40b50541fbe0",
             "sourceColumn": "LocationID",
             "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
-        "partitions": [
-          {
-            "name": "Jobs ID",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"location\", \"name\", \"salary\", \"title\"}, {\"Column1.id\", \"Column1.location\", \"Column1.name\", \"Column1.salary\", \"Column1.title\"}),",
-                "    #\"Expanded Column1.location\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.location\", {\"places\"}, {\"Column1.location.places\"}),",
-                "    #\"Expanded Column1.location.places\" = Table.ExpandListColumn(#\"Expanded Column1.location\", \"Column1.location.places\"),",
-                "    #\"Expanded Column1.location.places1\" = Table.ExpandRecordColumn(#\"Expanded Column1.location.places\", \"Column1.location.places\", {\"city\", \"country\"}, {\"Column1.location.places.city\", \"Column1.location.places.country\"}),",
-                "    #\"Expanded Column1.location.places.country\" = Table.ExpandRecordColumn(#\"Expanded Column1.location.places1\", \"Column1.location.places.country\", {\"name\"}, {\"Column1.location.places.country.name\"}),",
-                "    #\"Merged Columns\" = Table.CombineColumns(#\"Expanded Column1.location.places.country\",{\"Column1.location.places.country.name\", \"Column1.location.places.city\"},Combiner.CombineTextByDelimiter(\"-\", QuoteStyle.None),\"LocationID\"),",
-                "    #\"Expanded Column1.salary\" = Table.ExpandRecordColumn(#\"Merged Columns\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Expanded Column1.salary\",{{\"Column1.id\", \"ID\"}, {\"Column1.name\", \"Company\"}, {\"Column1.title\", \"Title\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Salary Type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Company\", type text}, {\"Title\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Salary Type\", type text}, {\"Currency\", type text}}),",
-                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono typ\", \"company--title\", each [Company] & \"--\" & [Title]),",
-                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"company--title\", type text}}),",
-                "    #\"Removed Duplicates\" = Table.Distinct(#\"Changed Type\")",
-                "in",
-                "    #\"Removed Duplicates\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Tech",
-        "annotations": [
-          {
-            "name": "PBI_ResultType",
-            "value": "Table"
-          }
-        ],
-        "columns": [
-          {
-            "name": "ID",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "34d7feb2-05b2-4f47-b906-acc3c8b75d22",
-            "sourceColumn": "ID",
-            "summarizeBy": "none"
           },
           {
-            "name": "Technology",
+            "name": "Seniority",
             "annotations": [
               {
                 "name": "SummarizationSetBy",
@@ -681,8 +667,8 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "3f27dc3f-8a41-4b25-b9bd-c8ff681225a3",
-            "sourceColumn": "Technology",
+            "lineageTag": "d27a4cde-5eee-4b47-9529-0660d38e8186",
+            "sourceColumn": "Seniority",
             "summarizeBy": "none"
           },
           {
@@ -694,12 +680,12 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "daa07ebe-1e55-4373-8a83-285e66230986",
+            "lineageTag": "faa85bfa-0147-4068-bcad-ff262c66d247",
             "sourceColumn": "Category",
             "summarizeBy": "none"
           },
           {
-            "name": "Flavors",
+            "name": "Technology",
             "annotations": [
               {
                 "name": "SummarizationSetBy",
@@ -707,31 +693,53 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "595053d3-cb0d-4f65-9b63-8b66806778d1",
-            "sourceColumn": "Flavors",
+            "lineageTag": "8609001e-e673-4131-8e5b-d6a5c74ca47e",
+            "sourceColumn": "Technology",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Group",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "4c75ab5b-b22f-42a8-8119-11624ddb1c3a",
+            "sourceColumn": "Group",
             "summarizeBy": "none"
           }
         ],
-        "lineageTag": "3a0ea90f-19e9-47e1-9d2a-9f0f4ddf30c6",
+        "lineageTag": "84a57617-b5b1-46a7-8658-4dce93d506d3",
         "partitions": [
           {
-            "name": "Tech",
+            "name": "Jobs ID",
             "mode": "import",
             "source": {
               "expression": [
                 "let",
                 "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"technology\", \"category\", \"flavors\"}, {\"Column1.id\", \"Column1.technology\", \"Column1.category\", \"Column1.flavors\"}),",
-                "    #\"Rozwinięty element Column1.flavors\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.flavors\"),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.flavors\"),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.id\", \"ID\"}, {\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}, {\"Column1.flavors\", \"Flavors\"}}),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Technology\", type text}, {\"Category\", type text}, {\"Flavors\", type text}}),",
-                "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
-                "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
-                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}}),",
-                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] <> null and [Technology] <> \"\"))",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"category\", \"id\", \"location\", \"name\", \"salary\", \"seniority\", \"technology\", \"title\"}, {\"Column1.category\", \"Column1.id\", \"Column1.location\", \"Column1.name\", \"Column1.salary\", \"Column1.seniority\", \"Column1.technology\", \"Column1.title\"}),",
+                "    #\"Expanded Column1.seniority\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.seniority\"),",
+                "    #\"Expanded Column1.location\" = Table.ExpandRecordColumn(#\"Expanded Column1.seniority\", \"Column1.location\", {\"places\"}, {\"Column1.location.places\"}),",
+                "    #\"Expanded Column1.location.places\" = Table.ExpandListColumn(#\"Expanded Column1.location\", \"Column1.location.places\"),",
+                "    #\"Expanded Column1.location.places1\" = Table.ExpandRecordColumn(#\"Expanded Column1.location.places\", \"Column1.location.places\", {\"city\", \"country\"}, {\"Column1.location.places.city\", \"Column1.location.places.country\"}),",
+                "    #\"Expanded Column1.location.places.country\" = Table.ExpandRecordColumn(#\"Expanded Column1.location.places1\", \"Column1.location.places.country\", {\"name\"}, {\"Column1.location.places.country.name\"}),",
+                "    #\"Merged Columns\" = Table.CombineColumns(#\"Expanded Column1.location.places.country\",{\"Column1.location.places.country.name\", \"Column1.location.places.city\"},Combiner.CombineTextByDelimiter(\"-\", QuoteStyle.None),\"LocationID\"),",
+                "    #\"Expanded Column1.salary\" = Table.ExpandRecordColumn(#\"Merged Columns\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Expanded Column1.salary\",{{\"Column1.id\", \"ID\"}, {\"Column1.name\", \"Company\"}, {\"Column1.title\", \"Title\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Salary Type\"}, {\"Column1.salary.currency\", \"Currency\"}, {\"Column1.seniority\", \"Seniority\"}, {\"Column1.category\", \"Category\"}, {\"Column1.technology\", \"Technology\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"ID\", type text}, {\"Company\", type text}, {\"Title\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Salary Type\", type text}, {\"Currency\", type text}, {\"Seniority\", type text}, {\"Category\", type text}}),",
+                "    #\"Cleaned Text\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Company\", Text.Clean, type text}, {\"Title\", Text.Clean, type text}}),",
+                "    #\"Reordered Columns\" = Table.ReorderColumns(#\"Cleaned Text\",{\"Category\", \"ID\", \"LocationID\", \"Company\", \"Title\", \"Salary from\", \"Salary to\", \"Salary Type\", \"Currency\", \"Seniority\", \"Technology\"}),",
+                "    #\"Trimmed Text\" = Table.TransformColumns(#\"Reordered Columns\",{{\"Title\", Text.Trim, type text}, {\"Company\", Text.Trim, type text}}),",
+                "    #\"Uppercased Text\" = Table.TransformColumns(#\"Trimmed Text\",{{\"Title\", Text.Upper, type text}, {\"Company\", Text.Upper, type text}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Uppercased Text\", \"company--title\", each [Company] & \"--\" & [Title]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"company--title\", type text}, {\"Technology\", type text}}),",
+                "    #\"Removed Duplicates\" = Table.Distinct(#\"Changed Type\"),",
+                "    #\"Added Custom1\" = Table.AddColumn(#\"Removed Duplicates\", \"Group\", each if [Technology] is null or [Technology] = \"\" then \"Non-tech\" else \"Tech\")",
                 "in",
-                "    #\"Przefiltrowano wiersze\""
+                "    #\"Added Custom1\""
               ],
               "type": "m"
             }
@@ -771,16 +779,10 @@
         "measures": [
           {
             "name": "Job offerts",
-            "annotations": [
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
             "displayFolder": "Counts",
             "expression": [
               "",
-              "var cnt = COUNT('Jobs ID'[ID])",
+              "var cnt = COUNT('Salary DIM'[ID])",
               "var valueToReturn = ",
               "    IF(",
               "        ISBLANK(cnt),",
@@ -788,6 +790,7 @@
               "        cnt)",
               "return valueToReturn"
             ],
+            "formatString": "0",
             "lineageTag": "77ea82a6-4d3b-4c43-af9c-467854d2e59e"
           },
           {
@@ -820,15 +823,16 @@
               "",
               "var mostPopularTechTable = ",
               "    ADDCOLUMNS(",
-              "        'Technology DIM', ",
+              "        DISTINCT('Technology DIM'[Technology Pretty]), ",
               "        \"Cnt\", [Jobs])",
               "var techMaxCnt = MAXX(mostPopularTechTable, [Cnt])",
               "var mostPopularTech = ",
               "    FILTER(",
               "        mostPopularTechTable, ",
-              "        [Cnt] = techMaxCnt && [Cnt] <> 0)",
+              "        [Cnt] = techMaxCnt && [Cnt] <> 0",
+              "        )",
               "var technology = CONCATENATEX(mostPopularTech,[Technology Pretty], \" & \")",
-              "var nonTechJobCNT = COUNTROWS('Non Tech DIM')",
+              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
               "var isBlankTech = ISBLANK(technology)",
               "var valueToReturn =  ",
               "    IF(",
@@ -862,7 +866,7 @@
               "        [Average] = topOneSalary && [Average] <> 0)",
               "",
               "var technologies = CONCATENATEX(topSalary,[Technology Pretty], \" & \")",
-              "var nonTechJobCNT = COUNTROWS('Non Tech DIM')",
+              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
               "var isBlankTech = ISBLANK(technologies)",
               "var valueToReturn = IF(",
               "    isBlankTech && nonTechJobCNT = 0,",
@@ -882,7 +886,7 @@
               "",
               "var category = ",
               "    ADDCOLUMNS(",
-              "        'Tech category DIM',",
+              "        'Category DIM',",
               "        \"CNT\",",
               "        [Jobs])",
               "var topCategory = ",
@@ -891,9 +895,9 @@
               "    CONCATENATEX(",
               "        FILTER(category, ",
               "        [CNT] = topCategory && [CNT] <> 0),",
-              "        [Category —Pretty]",
+              "        'Category DIM'[Category - Pretty]",
               "    ,\" & \")",
-              "var nonTechJobCNT = COUNTROWS('Non Tech DIM')",
+              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
               "var isBlankCategory = ISBLANK(categories)",
               "var valueToReturn = ",
               "    IF(",
@@ -927,7 +931,7 @@
           {
             "name": "Jobs",
             "displayFolder": "Counts",
-            "expression": "COUNTROWS('Jobs ID')",
+            "expression": "COUNTROWS('Salary DIM')",
             "formatString": "0",
             "lineageTag": "d9191273-a21e-4f65-9b1d-46a4ff2067ff"
           },
@@ -1005,7 +1009,7 @@
           },
           {
             "name": "Selected Category",
-            "expression": "SELECTEDVALUE('Tech category DIM'[Category —Pretty], BLANK())",
+            "expression": "SELECTEDVALUE('Category DIM'[Category], BLANK())",
             "lineageTag": "c2f114ee-5d34-4cae-855a-dcdb61b673a9"
           },
           {
@@ -1029,7 +1033,7 @@
             "expression": [
               "",
               "var techValue = SELECTEDVALUE('Technology DIM'[Technology], BLANK())",
-              "var categoryValue = SELECTEDVALUE('Tech category DIM'[Category], BLANK())",
+              "var categoryValue = SELECTEDVALUE('Category DIM'[Category], BLANK())",
               "",
               "var techTest = NOT ISBLANK(techValue)",
               "var categoryTest = NOT ISBLANK(categoryValue)",
@@ -1046,8 +1050,8 @@
               "                            ALL('Jobs ID'[Company]))",
               "                            ,0)",
               "",
-              "var totalFrom = CALCULATE([Average Category From], ALL('Tech category DIM'))",
-              "var totalTo = CALCULATE([Average Category To], ALL('Tech category DIM'))",
+              "var totalFrom = CALCULATE([Average Category From], ALL('Category DIM'))",
+              "var totalTo = CALCULATE([Average Category To], ALL('Category DIM'))",
               "",
               "var technologyLevel = FORMAT(DIVIDE(avgSalaryFrom, categoryFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, categoryTo), \"Percent\")",
               "var categoryLevel = FORMAT(DIVIDE(avgSalaryFrom, totalFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, totalTo), \"Percent\")",
@@ -1108,6 +1112,33 @@
             "expression": "DISTINCTCOUNT('Jobs ID'[company--title])",
             "formatString": "0",
             "lineageTag": "3a4a9e18-d2af-4e15-96cf-4d7c418e2414"
+          },
+          {
+            "name": "Technology title",
+            "expression": [
+              "",
+              "var tech_selected = SELECTEDVALUE('Technology DIM'[Technology Pretty], \"Multiple technology\")",
+              "var value_to_return = IF(ISBLANK(tech_selected),\"Not specified\", tech_selected)",
+              "return value_to_return"
+            ],
+            "lineageTag": "4f94b5d3-c910-4375-a0e7-313e9847eb64"
+          },
+          {
+            "name": "Mandatory skills cnt",
+            "expression": "DISTINCTCOUNT('Mandatory skills'[Skill])",
+            "formatString": "0",
+            "lineageTag": "a54de293-8225-4ea5-8440-ff727b79f8b0"
+          },
+          {
+            "name": "Average skills required per jobs",
+            "expression": [
+              "",
+              "var skills_per_job = ADDCOLUMNS('Unique Jobs DIM', \"CNT\", [Mandatory skills cnt])",
+              "var avg_of_cnt = AVERAGEX(skills_per_job, [CNT])",
+              "return avg_of_cnt"
+            ],
+            "formatString": "0",
+            "lineageTag": "21a3ef7e-9c20-4987-92f8-51de6c1e27a2"
           }
         ],
         "partitions": [
@@ -1656,96 +1687,14 @@
         "showAsVariationsOnly": true
       },
       {
-        "name": "Seniority DIM",
-        "annotations": [
-          {
-            "name": "PBI_ResultType",
-            "value": "Table"
-          }
-        ],
-        "columns": [
-          {
-            "name": "Seniorty",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "changedProperties": [
-              {
-                "property": "SortByColumn"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "3cfddc80-777f-494d-8edd-b909a248c3d3",
-            "sortByColumn": "Seniority order",
-            "sourceColumn": "Seniorty",
-            "summarizeBy": "none"
-          },
-          {
-            "name": "Seniority order",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "int64",
-            "formatString": "0",
-            "lineageTag": "323a81f9-8908-4ebf-88fc-865c83988a7c",
-            "sourceColumn": "Seniority order",
-            "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "e115afc2-cc90-4aac-bd8a-0c6a4f4a4a9f",
-        "partitions": [
-          {
-            "name": "Seniority DIM",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = Seniority,",
-                "    #\"Usunięto kolumny\" = Table.RemoveColumns(Źródło,{\"ID\"}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto kolumny\"),",
-                "    // Dodano kolumne do sortowania seniority",
-                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Usunięto duplikaty\", \"Seniority order\", each if [Seniorty] = \"Senior\" then 2 else if [Seniorty] = \"Expert\" then 1 else if [Seniorty] = \"Mid\" then 3 else if [Seniorty] = \"Junior\" then 4 else 5),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową\",{{\"Seniority order\", Int64.Type}})",
-                "in",
-                "    #\"Zmieniono typ\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
         "name": "Contract types DIM",
         "annotations": [
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
-          {
-            "name": "Contract type",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "65f630b8-c223-4a46-8ed8-f9ed72ae3436",
-            "sourceColumn": "Contract type",
-            "summarizeBy": "none"
-          },
           {
             "name": "Contract",
             "annotations": [
@@ -1758,6 +1707,19 @@
             "lineageTag": "39864b73-846a-4c72-afb2-18ca18706cb7",
             "sourceColumn": "Contract",
             "summarizeBy": "none"
+          },
+          {
+            "name": "Contract type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "8c29abf2-03a1-478b-881a-f3103462cf8b",
+            "sourceColumn": "Contract type",
+            "summarizeBy": "none"
           }
         ],
         "lineageTag": "972d004e-56f1-47db-a286-349c9c7cfc06",
@@ -1768,7 +1730,7 @@
             "source": {
               "expression": [
                 "let",
-                "    Źródło = Salary,",
+                "    Źródło = #\"Salary DIM\",",
                 "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Contract type\"}),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\"),",
                 "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Usunięto duplikaty\", \"Contract\", each if [Contract type] = \"b2b\" or [Contract type] = \"uod\" then Text.Upper([Contract type])",
@@ -1787,10 +1749,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
@@ -1803,7 +1761,7 @@
               }
             ],
             "dataType": "string",
-            "lineageTag": "4a6b0e2e-2b85-4de9-970d-679e0d657586",
+            "lineageTag": "9cdf1c64-91e6-49a7-99e5-526e4dbe414b",
             "sourceColumn": "Currency",
             "summarizeBy": "none"
           }
@@ -1816,7 +1774,7 @@
             "source": {
               "expression": [
                 "let",
-                "    Źródło = Salary,",
+                "    Źródło = #\"Salary DIM\",",
                 "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Currency\"}),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\")",
                 "in",
@@ -1833,6 +1791,10 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
           }
         ],
         "columns": [
@@ -1861,19 +1823,6 @@
             "lineageTag": "70a0237b-ba4d-43e9-ae14-c5d587364a05",
             "sourceColumn": "Technology Pretty",
             "summarizeBy": "none"
-          },
-          {
-            "name": "Category",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "1ad2b484-b6bd-4db1-8d45-7f605a51f80d",
-            "sourceColumn": "Category",
-            "summarizeBy": "none"
           }
         ],
         "lineageTag": "7a09890e-b7b6-4a67-8c8f-594b37271e6a",
@@ -1887,139 +1836,17 @@
                 "    Źródło = Tech,",
                 "    // Normalizacja tekstu ze względu na problem z usunięciem duplikatów",
                 "    #\"Normalizacja tekstu\" = Table.TransformColumns(Źródło, {{\"Technology\", Text.From, type text}}),",
-                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(#\"Normalizacja tekstu\",{\"Technology\", \"Category\"}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\", {\"Technology\"}),",
-                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Usunięto duplikaty\", each ([Technology] <> null and [Technology] <> \"\")),",
-                "    #\"Added Custom\" = Table.AddColumn(#\"Przefiltrowano wiersze\", \"Technology Pretty\", each if Text.Length([Technology]) <= 3 then Text.Upper([Technology])",
+                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(#\"Normalizacja tekstu\",{\"Technology\"}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Usunięto inne kolumny\", \"Technology Pretty\", each if Text.Length([Technology]) is null then \"Not specified\" else",
+                "if Text.Length([Technology]) <= 3 then Text.Upper([Technology])",
                 "else if List.Contains({\"Html\", \"Mysql\", \".Net\"}, [Technology])",
                 "then Text.Upper([Technology])",
                 "else Text.Proper([Technology])),",
-                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Technology Pretty\", type text}})",
+                "    #\"Filtered Rows\" = Table.SelectRows(#\"Added Custom\", each ([Technology] <> null and [Technology] <> \"\")),",
+                "    #\"Removed Duplicates\" = Table.Distinct(#\"Filtered Rows\"),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Removed Duplicates\",{{\"Technology Pretty\", type text}})",
                 "in",
                 "    #\"Changed Type\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Tech category DIM",
-        "annotations": [
-          {
-            "name": "PBI_ResultType",
-            "value": "Table"
-          }
-        ],
-        "columns": [
-          {
-            "name": "Category",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "af02b2ca-7804-4a33-b061-41eb98509e6e",
-            "sourceColumn": "Category",
-            "summarizeBy": "none"
-          },
-          {
-            "name": "Category —Pretty",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "fdb69e99-2ec7-4bb1-bb76-6d85cd9eb9b3",
-            "sourceColumn": "Category —Pretty",
-            "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "a4f9a030-9a5a-43ae-91d4-c857fc062ab0",
-        "partitions": [
-          {
-            "name": "Tech category DIM",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = Tech,",
-                "    #\"Usunięto inne kolumny\" = Table.SelectColumns(Źródło,{\"Category\"}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Usunięto inne kolumny\"),",
-                "    #\"Zduplikowano kolumnę\" = Table.DuplicateColumn(#\"Usunięto duplikaty\", \"Category\", \"Category — kopia\"),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zduplikowano kolumnę\",{{\"Category — kopia\", \"Category —Pretty\"}}),",
-                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Zmieniono nazwy kolumn\",{{\"Category —Pretty\", Text.Proper, type text}})",
-                "in",
-                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Non Tech DIM",
-        "annotations": [
-          {
-            "name": "PBI_ResultType",
-            "value": "Exception"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          }
-        ],
-        "columns": [
-          {
-            "name": "Technology",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "5b52deaf-ef79-40b7-964d-fe49e1abfe84",
-            "sourceColumn": "Technology",
-            "summarizeBy": "none"
-          },
-          {
-            "name": "Category",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "68a175e8-66cf-4daf-a4ab-6438e12a7026",
-            "sourceColumn": "Category",
-            "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "7bafa4bf-d6b5-4143-81dd-b152f9c3bd13",
-        "partitions": [
-          {
-            "name": "Non Tech DIM",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"technology\", \"category\"}, {\"Column1.technology\", \"Column1.category\"}),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Rozwinięty element Column1\",{{\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}}),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"Technology\", type text}, {\"Category\", type text}}),",
-                "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
-                "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
-                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}}),",
-                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] = null or [Technology] = \"\")),",
-                "    #\"Removed Duplicates\" = Table.Distinct(#\"Przefiltrowano wiersze\")",
-                "in",
-                "    #\"Removed Duplicates\""
               ],
               "type": "m"
             }
@@ -2030,12 +1857,12 @@
         "name": "Mandatory skills",
         "annotations": [
           {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
-          {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
           }
         ],
         "columns": [
@@ -2075,9 +1902,12 @@
               "expression": [
                 "let",
                 "    Source = Csv.Document(File.Contents(\"C:\\Users\\dzied\\OneDrive\\Desktop\\NoFluffJobs\\mandatory_skills.csv\"),[Delimiter=\";\", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
-                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    #\"Trimmed Text\" = Table.TransformColumns(#\"Promoted Headers\",{{\"Company--title\", Text.Trim, type text}}),",
+                "    #\"Cleaned Text\" = Table.TransformColumns(#\"Trimmed Text\",{{\"Company--title\", Text.Clean, type text}}),",
+                "    #\"Uppercased Text\" = Table.TransformColumns(#\"Cleaned Text\",{{\"Company--title\", Text.Upper, type text}})",
                 "in",
-                "    #\"Promoted Headers\""
+                "    #\"Uppercased Text\""
               ],
               "type": "m"
             }
@@ -2088,12 +1918,12 @@
         "name": "Optional skills",
         "annotations": [
           {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
-          {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
           }
         ],
         "columns": [
@@ -2133,77 +1963,12 @@
               "expression": [
                 "let",
                 "    Source = Csv.Document(File.Contents(\"C:\\Users\\dzied\\OneDrive\\Desktop\\NoFluffJobs\\optional_skills.csv\"),[Delimiter=\";\", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
-                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    #\"Trimmed Text\" = Table.TransformColumns(#\"Promoted Headers\",{{\"Company--title\", Text.Trim, type text}}),",
+                "    #\"Cleaned Text\" = Table.TransformColumns(#\"Trimmed Text\",{{\"Company--title\", Text.Clean, type text}}),",
+                "    #\"Uppercased Text\" = Table.TransformColumns(#\"Cleaned Text\",{{\"Company--title\", Text.Upper, type text}})",
                 "in",
-                "    #\"Promoted Headers\""
-              ],
-              "type": "m"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Non Tech Flavors DIM",
-        "annotations": [
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
-          {
-            "name": "PBI_ResultType",
-            "value": "Table"
-          }
-        ],
-        "columns": [
-          {
-            "name": "Category",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "4fdf1b57-0aee-4d12-b890-e052738b7ad1",
-            "sourceColumn": "Category",
-            "summarizeBy": "none"
-          },
-          {
-            "name": "Flavors",
-            "annotations": [
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "string",
-            "lineageTag": "16a54cc0-4adb-43da-bab8-75b8009cd269",
-            "sourceColumn": "Flavors",
-            "summarizeBy": "none"
-          }
-        ],
-        "lineageTag": "a42ff0b3-a5e6-4ae7-ba29-d83ba71d413e",
-        "partitions": [
-          {
-            "name": "Non Tech Flavors DIM",
-            "mode": "import",
-            "source": {
-              "expression": [
-                "let",
-                "    Źródło = posting,",
-                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"technology\", \"category\", \"flavors\"}, {\"Column1.technology\", \"Column1.category\", \"Column1.flavors\"}),",
-                "    #\"Rozwinięty element Column1.flavors\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.flavors\"),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.flavors\"),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.technology\", \"Technology\"}, {\"Column1.category\", \"Category\"}, {\"Column1.flavors\", \"Flavors\"}}),",
-                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"Technology\", type text}, {\"Category\", type text}, {\"Flavors\", type text}}),",
-                "    #\"Oczyszczono tekst\" = Table.TransformColumns(#\"Zmieniono typ\",{{\"Technology\", Text.Clean, type text}}),",
-                "    #\"Tekst pisany małymi literami\" = Table.TransformColumns(#\"Oczyszczono tekst\",{{\"Technology\", Text.Lower, type text}}),",
-                "    #\"Zmieniono pierwszą literę każdego wyrazu na wielką\" = Table.TransformColumns(#\"Tekst pisany małymi literami\",{{\"Technology\", Text.Proper, type text}}),",
-                "    #\"Przefiltrowano wiersze\" = Table.SelectRows(#\"Zmieniono pierwszą literę każdego wyrazu na wielką\", each ([Technology] = null or [Technology] = \"\")),",
-                "    #\"Removed Columns\" = Table.RemoveColumns(#\"Przefiltrowano wiersze\",{\"Technology\"}),",
-                "    #\"Removed Duplicates\" = Table.Distinct(#\"Removed Columns\")",
-                "in",
-                "    #\"Removed Duplicates\""
+                "    #\"Uppercased Text\""
               ],
               "type": "m"
             }
@@ -2213,10 +1978,6 @@
       {
         "name": "Location DIM",
         "annotations": [
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
           {
             "name": "PBI_ResultType",
             "value": "Table"
@@ -2285,6 +2046,328 @@
                 "    #\"Changed Type1\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"LocationID\", type text}})",
                 "in",
                 "    #\"Changed Type1\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Category DIM",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "f3958158-8ac0-49d7-82e9-f2dd10d35814",
+            "sourceColumn": "Category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Category - Pretty",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "7ccc882b-beeb-4326-8afd-7de83e55424d",
+            "sourceColumn": "Category - Pretty",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "43005b75-be40-4b5b-b374-b9f0419d5423",
+        "partitions": [
+          {
+            "name": "Category DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"category\"}, {\"Column1.category\"}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1\"),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Usunięto duplikaty\",{{\"Column1.category\", \"Category\"}}),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Zmieniono nazwy kolumn\",{{\"Category\", type text}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono typ\", \"Category - Pretty\", each if Text.Length([Category]) <= 3 then Text.Upper([Category])",
+                "else Text.Proper([Category]))",
+                "in",
+                "    #\"Added Custom\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Salary DIM",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ID",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "32f0d871-ae00-4871-8a03-5b06b46186c7",
+            "sourceColumn": "ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Salary from",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6a063cba-7568-4235-a363-cc97e809c402",
+            "sourceColumn": "Salary from",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Salary to",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "229ad45d-e0e9-4986-8482-f36c0ae42cfb",
+            "sourceColumn": "Salary to",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Contract type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5ad84ebe-ae52-427f-9413-6372ce6c8d59",
+            "sourceColumn": "Contract type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Currency",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "bdd89a96-b348-4da7-af8c-e5898d4eeae6",
+            "sourceColumn": "Currency",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Salary category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "83049f92-4e97-4d03-ac0d-b21bdc04feaa",
+            "sourceColumn": "Salary category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Category sort",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "b0501549-8a5d-4d05-8421-bd1f8eab51c2",
+            "sourceColumn": "Category sort",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "4b037ce1-de96-4a9f-accd-2d110edb9f11",
+        "partitions": [
+          {
+            "name": "Salary DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Źródło = posting,",
+                "    #\"Rozwinięty element Column1\" = Table.ExpandRecordColumn(Źródło, \"Column1\", {\"id\", \"salary\"}, {\"Column1.id\", \"Column1.salary\"}),",
+                "    #\"Rozwinięty element Column1.salary\" = Table.ExpandRecordColumn(#\"Rozwinięty element Column1\", \"Column1.salary\", {\"from\", \"to\", \"type\", \"currency\"}, {\"Column1.salary.from\", \"Column1.salary.to\", \"Column1.salary.type\", \"Column1.salary.currency\"}),",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Rozwinięty element Column1.salary\",{{\"Column1.id\", \"ID\"}, {\"Column1.salary.from\", \"Salary from\"}, {\"Column1.salary.to\", \"Salary to\"}, {\"Column1.salary.type\", \"Contract type\"}, {\"Column1.salary.currency\", \"Currency\"}}),",
+                "    // Rozwiązanie tymczasowe, do zastąpienia po wdrożeniu przeliczników walutowych.",
+                "    #\"Dodano kolumnę niestandardową\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Salary category\", each if [Salary to] < 10000 then \"Up to 10.000\" else",
+                "if [Salary to] < 20000 then \"Up to 20.000\" else",
+                "if [Salary to] < 30000 then \"Up to 30.000\" else ",
+                "if [Salary to] < 40000 then \"Up to 40.000\" else",
+                "\"More then 40.000\"),",
+                "    #\"Dodano kolumnę niestandardową1\" = Table.AddColumn(#\"Dodano kolumnę niestandardową\", \"Category sort\", each if [Salary to] < 10000 then 0 else",
+                "if [Salary to] < 20000 then 1 else ",
+                "if [Salary to] < 30000 then 2 else ",
+                "if [Salary to] < 40000 then 3 else 4),",
+                "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}}),",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Zmieniono typ\")",
+                "in",
+                "    #\"Usunięto duplikaty\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Unique Jobs DIM",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Company",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "e3df7e23-aa31-45d3-b625-f92a85fbe740",
+            "sourceColumn": "Company",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "d2913b00-9b02-452c-b3b6-5beb023bbc18",
+            "sourceColumn": "Title",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Company--title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "44dee5dd-8bad-4b4f-813c-53a0d5ff277a",
+            "sourceColumn": "Company--title",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "13c156a6-7076-4f7f-85ea-1dbaf3b5b463",
+        "partitions": [
+          {
+            "name": "Unique Jobs DIM",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = posting,",
+                "    #\"Expanded Column1\" = Table.ExpandRecordColumn(Source, \"Column1\", {\"name\", \"title\"}, {\"Company\", \"Title\"}),",
+                "    #\"Cleaned Text\" = Table.TransformColumns(#\"Expanded Column1\",{{\"Title\", Text.Clean, type text}, {\"Company\", Text.Clean, type text}}),",
+                "    #\"Trimmed Text\" = Table.TransformColumns(#\"Cleaned Text\",{{\"Title\", Text.Trim, type text}, {\"Company\", Text.Trim, type text}}),",
+                "    #\"Uppercased Text\" = Table.TransformColumns(#\"Trimmed Text\",{{\"Company\", Text.Upper, type text}, {\"Title\", Text.Upper, type text}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Uppercased Text\", \"Company--title\", each [Company] & \"--\" & [Title]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Company--title\", type text}}),",
+                "    #\"Removed Duplicates\" = Table.Distinct(#\"Changed Type\"),",
+                "    #\"Sorted Rows\" = Table.Sort(#\"Removed Duplicates\",{{\"Company\", Order.Ascending}}),",
+                "    #\"Capitalized Each Word\" = Table.TransformColumns(#\"Sorted Rows\",{{\"Company\", Text.Proper, type text}, {\"Title\", Text.Proper, type text}})",
+                "in",
+                "    #\"Capitalized Each Word\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Job Group",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Group",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "aed12c98-784d-410e-9ab8-2de16e763b56",
+            "sourceColumn": "Group",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "03e4aed3-566d-42b8-adc0-82a89282114a",
+        "partitions": [
+          {
+            "name": "Job Group",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(\"i45WCklNzlCK1YlW8svP0y0Bc2IB\", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Group = _t])",
+                "in",
+                "    Source"
               ],
               "type": "m"
             }
