@@ -795,12 +795,6 @@
           },
           {
             "name": "Average Salaty",
-            "annotations": [
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
@@ -814,6 +808,7 @@
               "    averageSalary)",
               "return valueToReturn"
             ],
+            "formatString": "0",
             "lineageTag": "d75a7bca-ffe3-467d-ade5-a65c207f6267"
           },
           {
@@ -832,7 +827,7 @@
               "        [Cnt] = techMaxCnt && [Cnt] <> 0",
               "        )",
               "var technology = CONCATENATEX(mostPopularTech,[Technology Pretty], \" & \")",
-              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
+              "var nonTechJobCNT = COUNTROWS('Salary DIM')",
               "var isBlankTech = ISBLANK(technology)",
               "var valueToReturn =  ",
               "    IF(",
@@ -866,7 +861,7 @@
               "        [Average] = topOneSalary && [Average] <> 0)",
               "",
               "var technologies = CONCATENATEX(topSalary,[Technology Pretty], \" & \")",
-              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
+              "var nonTechJobCNT = COUNTROWS('Salary DIM')",
               "var isBlankTech = ISBLANK(technologies)",
               "var valueToReturn = IF(",
               "    isBlankTech && nonTechJobCNT = 0,",
@@ -897,7 +892,7 @@
               "        [CNT] = topCategory && [CNT] <> 0),",
               "        'Category DIM'[Category - Pretty]",
               "    ,\" & \")",
-              "var nonTechJobCNT = COUNTROWS(FILTER('Technology DIM', 'Technology DIM'[Technology] = \"\"))",
+              "var nonTechJobCNT = COUNTROWS('Salary DIM')",
               "var isBlankCategory = ISBLANK(categories)",
               "var valueToReturn = ",
               "    IF(",
@@ -1013,22 +1008,6 @@
             "lineageTag": "c2f114ee-5d34-4cae-855a-dcdb61b673a9"
           },
           {
-            "name": "Average Salary",
-            "expression": [
-              "",
-              "var avgMin = [Salary AVG From]",
-              "var avgMax = [Salary AVG To]",
-              "var salaryTest = ISBLANK(avgMin) && ISBLANK(avgMax)",
-              "var valueToReturn = ",
-              "    IF(salaryTest,",
-              "        BLANK(),",
-              "        ROUND([Salary AVG From], 0) & \" - \" & ROUND([Salary AVG To], 0))",
-              "return valueToReturn",
-              ""
-            ],
-            "lineageTag": "d5a7fd8b-cca6-4dd9-98d4-022cc36f0861"
-          },
-          {
             "name": "% of Average",
             "expression": [
               "",
@@ -1139,6 +1118,75 @@
             ],
             "formatString": "0",
             "lineageTag": "21a3ef7e-9c20-4987-92f8-51de6c1e27a2"
+          },
+          {
+            "name": "Unique Average Salary",
+            "expression": [
+              "",
+              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", [Average Salaty])",
+              "var value_to_return = AVERAGEX(unique_jobs_salary, [Salary])",
+              "return value_to_return"
+            ],
+            "formatString": "0",
+            "lineageTag": "dcd6aede-c0ff-458d-ade0-7fec53af85e1"
+          },
+          {
+            "name": "Unique jobs count",
+            "expression": "DISTINCTCOUNT('Unique Jobs DIM'[Company--title])",
+            "formatString": "0",
+            "lineageTag": "f587bf0b-3e51-4aa4-ad40-563bceb0295a"
+          },
+          {
+            "name": "Median Salary M",
+            "expression": "MEDIANX('Salary DIM', ([Salary AVG To] + [Salary AVG From]) / 2 )",
+            "formatString": "0",
+            "lineageTag": "91997e9f-44a5-4a46-862c-3f46b7767090"
+          },
+          {
+            "name": "Top20PercentAvg",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var top_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
+              "var top_20_percent = TOPN(top_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], DESC)",
+              "var average_top_20 = AVERAGEX(",
+              "    top_20_percent, [Salary mid])",
+              "return average_top_20"
+            ],
+            "lineageTag": "3446722c-e6ef-4604-99f0-605236996e97"
+          },
+          {
+            "name": "Measure",
+            "annotations": [
+              {
+                "name": "43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c",
+                "value": "True"
+              }
+            ],
+            "lineageTag": "52a68f16-2e35-438a-9cab-19a9bd9c6f4a"
+          },
+          {
+            "name": "Lowest 20 Percent Avg",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var top_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
+              "var top_20_percent = TOPN(top_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], ASC)",
+              "var average_top_20 = AVERAGEX(",
+              "    top_20_percent, [Salary mid])",
+              "return average_top_20"
+            ],
+            "lineageTag": "619644cf-843e-4600-abc1-95fccb6cf428"
           }
         ],
         "partitions": [
@@ -2217,6 +2265,20 @@
             "lineageTag": "b0501549-8a5d-4d05-8421-bd1f8eab51c2",
             "sourceColumn": "Category sort",
             "summarizeBy": "sum"
+          },
+          {
+            "name": "Salary mid",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "408e0bc3-9363-4bbc-8553-3271f37b6ce1",
+            "sourceColumn": "Salary mid",
+            "summarizeBy": "sum"
           }
         ],
         "lineageTag": "4b037ce1-de96-4a9f-accd-2d110edb9f11",
@@ -2242,9 +2304,12 @@
                 "if [Salary to] < 30000 then 2 else ",
                 "if [Salary to] < 40000 then 3 else 4),",
                 "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Dodano kolumnę niestandardową1\",{{\"ID\", type text}, {\"Salary from\", Int64.Type}, {\"Salary to\", Int64.Type}, {\"Contract type\", type text}, {\"Currency\", type text}, {\"Salary category\", type text}, {\"Category sort\", Int64.Type}}),",
-                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Zmieniono typ\")",
+                "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Zmieniono typ\"),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Usunięto duplikaty\", \"Salary mid\", each ([Salary from] + [Salary to]) / 2),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Salary mid\", Int64.Type}}),",
+                "    #\"Reordered Columns\" = Table.ReorderColumns(#\"Changed Type\",{\"ID\", \"Salary from\", \"Salary mid\", \"Salary to\", \"Contract type\", \"Currency\", \"Salary category\", \"Category sort\"})",
                 "in",
-                "    #\"Usunięto duplikaty\""
+                "    #\"Reordered Columns\""
               ],
               "type": "m"
             }
