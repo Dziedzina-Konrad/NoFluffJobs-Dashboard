@@ -554,10 +554,6 @@
               {
                 "name": "SummarizationSetBy",
                 "value": "Automatic"
-              },
-              {
-                "name": "__PBI_SemanticLinks",
-                "value": "[{\"LinkTarget\":{\"TableName\":\"Jobs ID\",\"TableItemName\":\"Salary to (bins)\",\"ObjectType\":4},\"LinkType\":\"UsedInGroup\"}]"
               }
             ],
             "dataType": "int64",
@@ -591,59 +587,6 @@
             "lineageTag": "9601d99c-9ad7-43a3-bbab-83e7869caae5",
             "sourceColumn": "Currency",
             "summarizeBy": "none"
-          },
-          {
-            "name": "Salary to (bins)",
-            "annotations": [
-              {
-                "name": "GroupingDesignState",
-                "value": "{\"Version\":0,\"Sources\":[{\"Name\":\"j\",\"Entity\":\"Jobs ID\"}],\"GroupedColumns\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"j\"}},\"Property\":\"Salary to\"}}],\"BinItem\":{\"Expression\":{\"Floor\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"j\"}},\"Property\":\"Salary to\"}},\"Size\":10000.0}}}}"
-              },
-              {
-                "name": "SummarizationSetBy",
-                "value": "Automatic"
-              }
-            ],
-            "dataType": "int64",
-            "expression": [
-              "IF(",
-              "\tISBLANK('Jobs ID'[Salary to]),",
-              "\tBLANK(),",
-              "\tINT('Jobs ID'[Salary to] / 10000) * 10000",
-              ")"
-            ],
-            "extendedProperties": [
-              {
-                "name": "GroupingMetadata",
-                "type": "json",
-                "value": {
-                  "binningMetadata": {
-                    "binSize": {
-                      "unit": 0,
-                      "value": 10000.0
-                    }
-                  },
-                  "groupedColumns": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Jobs ID"
-                          }
-                        },
-                        "Property": "Salary to"
-                      }
-                    }
-                  ],
-                  "version": 0
-                }
-              }
-            ],
-            "formatString": "0",
-            "isDataTypeInferred": true,
-            "lineageTag": "570dbfcd-7a8a-4629-a40d-8697a3111acd",
-            "summarizeBy": "none",
-            "type": "calculated"
           },
           {
             "name": "LocationID",
@@ -804,7 +747,7 @@
               "var averageSalary = (sumMax + sumMin) / (countSalaryRows * 2)",
               "var valueToReturn = IF(",
               "    ISBLANK(averageSalary),",
-              "    0, ",
+              "    \"No jobs\", ",
               "    averageSalary)",
               "return valueToReturn"
             ],
@@ -1104,7 +1047,7 @@
           },
           {
             "name": "Mandatory skills cnt",
-            "expression": "DISTINCTCOUNT('Mandatory skills'[Skill])",
+            "expression": "DISTINCTCOUNTNOBLANK('Mandatory skills'[Skill])",
             "formatString": "0",
             "lineageTag": "a54de293-8225-4ea5-8440-ff727b79f8b0"
           },
@@ -1121,43 +1064,56 @@
           },
           {
             "name": "Unique Average Salary",
+            "displayFolder": "KPI\\Salary",
             "expression": [
               "",
               "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", [Average Salaty])",
-              "var value_to_return = AVERAGEX(unique_jobs_salary, [Salary])",
+              "var average_salary = AVERAGEX(unique_jobs_salary, [Salary])",
+              "var value_to_return =  IF(ISBLANK(average_salary), [No jobs text], average_salary)",
+              "",
               "return value_to_return"
             ],
             "formatString": "0",
             "lineageTag": "dcd6aede-c0ff-458d-ade0-7fec53af85e1"
           },
           {
-            "name": "Unique jobs count",
-            "expression": "DISTINCTCOUNT('Unique Jobs DIM'[Company--title])",
+            "name": "Unique jobs count KPI",
+            "displayFolder": "KPI\\Jobs",
+            "expression": [
+              "",
+              "var cnt = DISTINCTCOUNT('Unique Jobs DIM'[Company--title])",
+              "var value_to_return = IF(ISBLANK(cnt), [No jobs text], cnt)",
+              "return value_to_return"
+            ],
             "formatString": "0",
             "lineageTag": "f587bf0b-3e51-4aa4-ad40-563bceb0295a"
           },
           {
             "name": "Median Salary M",
-            "expression": "MEDIANX('Salary DIM', ([Salary AVG To] + [Salary AVG From]) / 2 )",
+            "displayFolder": "KPI\\Salary",
+            "expression": [
+              "",
+              "var median_salary = MEDIANX('Salary DIM', 'Salary DIM'[Salary mid] )",
+              "var value_to_return = IF(ISBLANK(median_salary),[No jobs text], median_salary)",
+              "",
+              "return value_to_return"
+            ],
             "formatString": "0",
             "lineageTag": "91997e9f-44a5-4a46-862c-3f46b7767090"
           },
           {
-            "name": "Top20PercentAvg",
-            "annotations": [
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
+            "name": "Top 20 Percent Avg",
+            "displayFolder": "KPI\\Salary",
             "expression": [
               "",
               "var top_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
               "var top_20_percent = TOPN(top_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], DESC)",
               "var average_top_20 = AVERAGEX(",
               "    top_20_percent, [Salary mid])",
-              "return average_top_20"
+              "var value_to_return = IF(ISBLANK(average_top_20), [No jobs text], average_top_20)",
+              "return value_to_return"
             ],
+            "formatString": "0",
             "lineageTag": "3446722c-e6ef-4604-99f0-605236996e97"
           },
           {
@@ -1172,21 +1128,132 @@
           },
           {
             "name": "Lowest 20 Percent Avg",
+            "displayFolder": "KPI\\Salary",
+            "expression": [
+              "",
+              "var bottom_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
+              "var bottom_20_percent = TOPN(bottom_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], ASC)",
+              "var average_bottom_20 = AVERAGEX(",
+              "    bottom_20_percent, [Salary mid])",
+              "var value_to_return = IF(ISBLANK(average_bottom_20), [No jobs text], average_bottom_20)",
+              "return value_to_return"
+            ],
+            "formatString": "0",
+            "lineageTag": "619644cf-843e-4600-abc1-95fccb6cf428"
+          },
+          {
+            "name": "Average range",
+            "expression": [
+              "",
+              "var range_min = ROUND(AVERAGE('Salary DIM'[Salary from]),0)",
+              "var range_max = ROUND(AVERAGE('Salary DIM'[Salary to]),0)",
+              "var format_to_return = range_min & \" - \" & range_max ",
+              "var range_test = NOT ISBLANK(range_max)",
+              "var return_value = IF(range_test, format_to_return, BLANK())",
+              "return return_value"
+            ],
+            "lineageTag": "bd8ce97e-65cd-4e13-a8db-4bb9b78e2b5d"
+          },
+          {
+            "name": "Mandatory skills",
+            "expression": "VALUES('Mandatory skills'[Skill])",
+            "lineageTag": "5cfaa877-5388-46e0-ba48-0ff4347ecf5b"
+          },
+          {
+            "name": "Average mandatory skills",
+            "expression": "AVERAGE('Mandatory skills'[Skill])",
+            "formatString": "0",
+            "lineageTag": "f8a17557-b187-4ca4-922a-82570ef1f077"
+          },
+          {
+            "name": "Average skills required per jobs nice to have",
+            "expression": [
+              "",
+              "var skills_per_job = ADDCOLUMNS('Unique Jobs DIM', \"CNT\", [Nice to have skills cnt])",
+              "var avg_of_cnt = AVERAGEX(skills_per_job, [CNT])",
+              "return avg_of_cnt"
+            ],
+            "formatString": "0",
+            "lineageTag": "d582ece9-6a49-455e-960c-75558328cf0d"
+          },
+          {
+            "name": "Nice to have skills cnt",
+            "expression": "DISTINCTCOUNT('Optional skills'[Skill])",
+            "formatString": "0",
+            "lineageTag": "e2f06ef0-5c6c-4ff5-93b2-6cd36efaad82"
+          },
+          {
+            "name": "Job offerts KPI",
             "annotations": [
               {
                 "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
+                "value": "{\"isDecimal\":true}"
               }
             ],
+            "displayFolder": "KPI\\Jobs",
             "expression": [
               "",
-              "var top_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
-              "var top_20_percent = TOPN(top_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], ASC)",
-              "var average_top_20 = AVERAGEX(",
-              "    top_20_percent, [Salary mid])",
-              "return average_top_20"
+              "var cnt = COUNT('Salary DIM'[ID])",
+              "var valueToReturn = ",
+              "    IF(",
+              "        ISBLANK(cnt),",
+              "        [No jobs text],",
+              "        cnt)",
+              "return valueToReturn"
             ],
-            "lineageTag": "619644cf-843e-4600-abc1-95fccb6cf428"
+            "formatString": "0",
+            "lineageTag": "f55cbb53-032e-4395-9a0f-ac4a0b924053"
+          },
+          {
+            "name": "Average skills KPI",
+            "displayFolder": "KPI\\Jobs",
+            "expression": [
+              "",
+              "var skills_cnt = [Average skills required per jobs]",
+              "var value_to_return = IF(ISBLANK(skills_cnt), [No jobs text], skills_cnt)",
+              "return value_to_return"
+            ],
+            "formatString": "0",
+            "lineageTag": "ba087b69-70d6-4fa6-86c0-706b0c7ff4c8"
+          },
+          {
+            "name": "No jobs text",
+            "expression": "\"No jobs\"",
+            "lineageTag": "93900bd9-f03f-428d-b47f-325aeced27a9"
+          },
+          {
+            "name": "Average skills nice to have KPI",
+            "displayFolder": "KPI\\Jobs",
+            "expression": [
+              "",
+              "var skills_avg_cnt = [Average skills required per jobs nice to have]",
+              "var value_to_return = IF(ISBLANK(skills_avg_cnt), [No jobs text], skills_avg_cnt)",
+              "return value_to_return"
+            ],
+            "formatString": "0",
+            "lineageTag": "95ad9c45-ad91-4dd7-bae8-e298a1887b16"
+          },
+          {
+            "name": "Unique jobs count",
+            "expression": [
+              "",
+              "var cnt = DISTINCTCOUNT('Unique Jobs DIM'[Company--title])",
+              "return cnt"
+            ],
+            "formatString": "0",
+            "lineageTag": "2f66f847-e06f-4393-aa0f-22c10e906e4d"
+          },
+          {
+            "name": "Skills %",
+            "expression": [
+              "",
+              "var id_count = [Unique jobs count]",
+              "var all_jobs = CALCULATE([Unique jobs count], ALL('Mandatory skills'[Skill]))",
+              "",
+              "return id_count / all_jobs"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%",
+            "lineageTag": "69f81866-b4c5-4f51-832d-759f5e40bcb1"
           }
         ],
         "partitions": [
@@ -2272,6 +2339,10 @@
               {
                 "name": "SummarizationSetBy",
                 "value": "Automatic"
+              },
+              {
+                "name": "__PBI_SemanticLinks",
+                "value": "[{\"LinkTarget\":{\"TableName\":\"Salary DIM\",\"TableItemName\":\"Salary groups\",\"ObjectType\":4},\"LinkType\":\"UsedInGroup\"}]"
               }
             ],
             "dataType": "int64",
@@ -2279,6 +2350,59 @@
             "lineageTag": "408e0bc3-9363-4bbc-8553-3271f37b6ce1",
             "sourceColumn": "Salary mid",
             "summarizeBy": "sum"
+          },
+          {
+            "name": "Salary groups",
+            "annotations": [
+              {
+                "name": "GroupingDesignState",
+                "value": "{\"Version\":0,\"Sources\":[{\"Name\":\"s\",\"Entity\":\"Salary DIM\"}],\"GroupedColumns\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Salary mid\"}}],\"BinItem\":{\"Expression\":{\"Floor\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Salary mid\"}},\"Size\":7500.0}}}}"
+              },
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "expression": [
+              "IF(",
+              "\tISBLANK('Salary DIM'[Salary mid]),",
+              "\tBLANK(),",
+              "\tINT('Salary DIM'[Salary mid] / 7500) * 7500",
+              ")"
+            ],
+            "extendedProperties": [
+              {
+                "name": "GroupingMetadata",
+                "type": "json",
+                "value": {
+                  "binningMetadata": {
+                    "binSize": {
+                      "unit": 0,
+                      "value": 7500.0
+                    }
+                  },
+                  "groupedColumns": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "Salary DIM"
+                          }
+                        },
+                        "Property": "Salary mid"
+                      }
+                    }
+                  ],
+                  "version": 0
+                }
+              }
+            ],
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "lineageTag": "96cf0bd0-d4f1-413d-b8e2-d1c014221c48",
+            "summarizeBy": "none",
+            "type": "calculated"
           }
         ],
         "lineageTag": "4b037ce1-de96-4a9f-accd-2d110edb9f11",
