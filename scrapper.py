@@ -17,8 +17,8 @@ class NoFluffJobs():
       self.mandatory_df = pd.DataFrame(columns=["Company--title", "Skill"])
       self.nice_to_have_df =  pd.DataFrame(columns=["Company--title", "Skill"])
       self.job_pages = [] # List of company-title and url
-      self.unique_keys = [] # List of list unique company--title keyand links 
-      self.unique_jobs = [] # List of unique company--title 
+      self.unique_keys = [] # List of unique company--title 
+      self.unique_jobs = [] # List of list unique company--title keyand links 
       self.non_working_urls = []
       
       for job in nfj_jobs:
@@ -147,3 +147,12 @@ class NoFluffJobs():
       nice_to_have = pd.read_csv(nice_to_have_csv, sep=sep , index_col = False)
       self.nice_to_have_df = pd.concat([nice_to_have, self.nice_to_have_df])
       print("Loading saved files completed.")
+      
+   def clean_df(self):
+      """ Use for cleaning data from non-actual jobs.
+      """
+      mandatory = self.mandatory_df
+      nice_to_have = self.nice_to_have_df
+      self.mandatory_df = mandatory[mandatory["Company--title"].isin(self.unique_keys)]
+      self.nice_to_have_df = nice_to_have[nice_to_have["Company--title"].isin(self.unique_keys)]
+      
