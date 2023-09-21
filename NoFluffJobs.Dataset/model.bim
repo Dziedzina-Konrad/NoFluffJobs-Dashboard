@@ -8,7 +8,7 @@
       },
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"Salary DIM\",\"Tech\",\"posting\",\"Jobs ID\",\"_Measures\",\"Time\",\"Mandatory skills\",\"Optional skills\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Location DIM\",\"Seniority DIM\",\"Category DIM\",\"Unique Jobs DIM\",\"Job Group\"]"
+        "value": "[\"Salary DIM\",\"Tech\",\"posting\",\"Jobs ID\",\"_Measures\",\"Time\",\"Mandatory skills\",\"Optional skills\",\"Contract types DIM\",\"Currencies DIM\",\"Technology DIM\",\"Location DIM\",\"Seniority DIM\",\"Category DIM\",\"Unique Jobs DIM\",\"Job Group\",\"Errors in Seniority DIM\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",
@@ -90,6 +90,51 @@
         ],
         "kind": "m",
         "lineageTag": "0e0e98e2-5ea7-4db4-aefa-bde826fc1103"
+      },
+      {
+        "name": "Errors in Seniority DIM",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "Source = #\"Seniority DIM\",",
+          "  #\"Detected Type Mismatches\" = let",
+          "    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),",
+          "    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),",
+          "    fieldNames = Record.FieldNames(recordTypeFields),",
+          "    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),",
+          "    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = \"The type of the value does not match the type of the column.\", Detail = v], fieldTypes{i}})",
+          "in",
+          "    Table.TransformColumns(Source, pairs),",
+          "  #\"Added Index\" = Table.AddIndexColumn(#\"Detected Type Mismatches\", \"Row Number\" ,1),",
+          "  #\"Kept Errors\" = Table.SelectRowsWithErrors(#\"Added Index\", {\"Seniority\", \"Seniority Order\"}),",
+          "  #\"Reordered Columns\" = Table.ReorderColumns(#\"Kept Errors\", {\"Row Number\", \"Seniority\", \"Seniority Order\"})",
+          "in",
+          "  #\"Reordered Columns\""
+        ],
+        "kind": "m",
+        "lineageTag": "36a78dd9-d14f-49f7-959e-8eed6187cf51",
+        "queryGroup": "Query Errors - 21 09 2023 09:31:52"
+      }
+    ],
+    "queryGroups": [
+      {
+        "annotations": [
+          {
+            "name": "PBI_QueryGroupOrder",
+            "value": "0"
+          }
+        ],
+        "description": "Errors in queries that were loaded on 21.09.2023 09:31:52.",
+        "folder": "Query Errors - 21 09 2023 09:31:52"
       }
     ],
     "relationships": [
@@ -113,7 +158,7 @@
         "name": "1da910e1-4afe-4080-aa18-f1488a6c3c61",
         "fromColumn": "Seniority",
         "fromTable": "Jobs ID",
-        "toColumn": "Seniorty",
+        "toColumn": "Seniority",
         "toTable": "Seniority DIM"
       },
       {
@@ -404,11 +449,15 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
           }
         ],
         "columns": [
           {
-            "name": "Seniorty",
+            "name": "Seniority",
             "annotations": [
               {
                 "name": "SummarizationSetBy",
@@ -423,7 +472,7 @@
             "dataType": "string",
             "lineageTag": "72a33760-46e3-4d98-b885-50e15fa03a69",
             "sortByColumn": "Seniority Order",
-            "sourceColumn": "Seniorty",
+            "sourceColumn": "Seniority",
             "summarizeBy": "none"
           },
           {
@@ -454,11 +503,11 @@
                 "    #\"Rozwinięty element Column1.seniority\" = Table.ExpandListColumn(#\"Rozwinięty element Column1\", \"Column1.seniority\"),",
                 "    #\"Usunięto duplikaty\" = Table.Distinct(#\"Rozwinięty element Column1.seniority\"),",
                 "    #\"Zmieniono typ\" = Table.TransformColumnTypes(#\"Usunięto duplikaty\",{{\"Column1.seniority\", type text}}),",
-                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.seniority\", \"Seniorty\"}}),",
-                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Seniority Order\", each if [Seniorty] = \"Trainee\" then 0 ",
-                "else if [Seniorty] = \"Junior\" then 1 ",
-                "else if [Seniorty] = \"Mid\" then 2 ",
-                "else if [Seniorty] = \"Senior\" then 3 ",
+                "    #\"Zmieniono nazwy kolumn\" = Table.RenameColumns(#\"Zmieniono typ\",{{\"Column1.seniority\", \"Seniority\"}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Zmieniono nazwy kolumn\", \"Seniority Order\", each if [Seniority] = \"Trainee\" then 0 ",
+                "else if [Seniority] = \"Junior\" then 1 ",
+                "else if [Seniority] = \"Mid\" then 2 ",
+                "else if [Seniority] = \"Senior\" then 3 ",
                 "else 4),",
                 "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Custom\",{{\"Seniority Order\", Int64.Type}})",
                 "in",
@@ -475,10 +524,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
@@ -721,23 +766,7 @@
         "lineageTag": "9c6f3896-b824-4110-a225-e78fe0a91a23",
         "measures": [
           {
-            "name": "Job offerts",
-            "displayFolder": "Counts",
-            "expression": [
-              "",
-              "var cnt = COUNT('Salary DIM'[ID])",
-              "var valueToReturn = ",
-              "    IF(",
-              "        ISBLANK(cnt),",
-              "        0,",
-              "        cnt)",
-              "return valueToReturn"
-            ],
-            "formatString": "0",
-            "lineageTag": "77ea82a6-4d3b-4c43-af9c-467854d2e59e"
-          },
-          {
-            "name": "Average Salaty",
+            "name": "Average Salary",
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
@@ -793,7 +822,7 @@
               "var techAverageSalary = ",
               "    ADDCOLUMNS(",
               "        'Technology DIM', ",
-              "        \"Average\", [Average Salaty])",
+              "        \"Average\", [Average Salary])",
               "",
               "var topOneSalary = ",
               "    MAXX(techAverageSalary, [Average])",
@@ -860,7 +889,7 @@
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
-              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salaty], ALL('Seniority DIM'))",
+              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salary], ALL('Seniority DIM'))",
               "return",
               "    avgSalaryWithoutSenioroty"
             ],
@@ -884,7 +913,7 @@
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
-              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salaty], ALL('Seniority DIM'))",
+              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salary], ALL('Seniority DIM'))",
               "return",
               "    avgSalaryWithoutSenioroty"
             ],
@@ -898,6 +927,7 @@
                 "value": "{\"isDecimal\":true}"
               }
             ],
+            "displayFolder": "Salary\\AVG",
             "expression": "AVERAGE('Jobs ID'[Salary from])",
             "formatString": "0",
             "lineageTag": "12f85278-4d21-49ab-a9ba-61d3eca65ba5"
@@ -910,48 +940,26 @@
                 "value": "{\"isDecimal\":true}"
               }
             ],
+            "displayFolder": "Salary\\AVG",
             "expression": "AVERAGE('Jobs ID'[Salary to])",
             "formatString": "0",
             "lineageTag": "c471103c-b722-46f5-aaca-758296e8d696"
           },
           {
-            "name": "% vs From ALL",
-            "expression": [
-              "",
-              "var avgFrom = [Salary AVG From]",
-              "var isSelectedCategory = ISBLANK([Selected Category])",
-              "var isSelectedTechnology = ISBLANK([Selected Tech])",
-              "",
-              "var valueToReturn = ",
-              "    IF(isSelectedCategory && isSelectedTechnology,",
-              "    BLANK(),",
-              "    IF(NOT isSelectedTechnology,",
-              "        1,",
-              "        2))",
-              "        ",
-              "return valueToReturn"
-            ],
-            "formatString": "0",
-            "lineageTag": "3f4d3c11-4a66-4b3a-b2dd-ad9cf51ea07c"
-          },
-          {
-            "name": "% vs To ALL",
-            "expression": "0",
-            "formatString": "0",
-            "lineageTag": "7ba18c70-5de0-45d8-84cb-7018d6d3affc"
-          },
-          {
             "name": "Selected Tech",
+            "displayFolder": "Selected",
             "expression": "SELECTEDVALUE('Technology DIM'[Technology Pretty], BLANK())",
             "lineageTag": "e491e5e7-c759-4daa-aea0-a2be6bd62886"
           },
           {
             "name": "Selected Category",
+            "displayFolder": "Selected",
             "expression": "SELECTEDVALUE('Category DIM'[Category], BLANK())",
             "lineageTag": "c2f114ee-5d34-4cae-855a-dcdb61b673a9"
           },
           {
             "name": "% of Average",
+            "displayFolder": "Salary",
             "expression": [
               "",
               "var jobs_value = SELECTEDVALUE('Jobs ID'[company--title], BLANK())",
@@ -997,6 +1005,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Salary\\AVG",
             "expression": [
               "ROUND(CALCULATE([Salary AVG From], ",
               "                            ALL('Technology DIM'), ",
@@ -1013,6 +1022,7 @@
                 "value": "{\"isGeneralNumber\":true}"
               }
             ],
+            "displayFolder": "Salary\\AVG",
             "expression": [
               "ROUND(CALCULATE([Salary AVG To], ",
               "                            ALL('Technology DIM'), ",
@@ -1022,29 +1032,15 @@
             "lineageTag": "81f7411f-dab7-4b23-aae9-f40bda1961c2"
           },
           {
-            "name": "Distinct jobs",
-            "expression": "DISTINCTCOUNT('Jobs ID'[company--title])",
-            "formatString": "0",
-            "lineageTag": "3a4a9e18-d2af-4e15-96cf-4d7c418e2414"
-          },
-          {
-            "name": "Technology title",
-            "expression": [
-              "",
-              "var tech_selected = SELECTEDVALUE('Technology DIM'[Technology Pretty], \"Multiple technology\")",
-              "var value_to_return = IF(ISBLANK(tech_selected),\"Not specified\", tech_selected)",
-              "return value_to_return"
-            ],
-            "lineageTag": "4f94b5d3-c910-4375-a0e7-313e9847eb64"
-          },
-          {
             "name": "Mandatory skills cnt",
+            "displayFolder": "Skills",
             "expression": "DISTINCTCOUNTNOBLANK('Mandatory skills'[Skill])",
             "formatString": "0",
             "lineageTag": "a54de293-8225-4ea5-8440-ff727b79f8b0"
           },
           {
             "name": "Average skills required per jobs",
+            "displayFolder": "Skills",
             "expression": [
               "",
               "var skills_per_job = ADDCOLUMNS('Unique Jobs DIM', \"CNT\", [Mandatory skills cnt])",
@@ -1059,7 +1055,7 @@
             "displayFolder": "KPI\\Salary",
             "expression": [
               "",
-              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", [Average Salaty])",
+              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", [Average Salary])",
               "var average_salary = AVERAGEX(unique_jobs_salary, [Salary])",
               "var value_to_return =  IF(ISBLANK(average_salary), [No jobs text], average_salary)",
               "",
@@ -1125,6 +1121,7 @@
           },
           {
             "name": "Average range",
+            "displayFolder": "Salary\\AVG",
             "expression": [
               "",
               "var range_min = ROUND(AVERAGE('Salary DIM'[Salary from]),0)",
@@ -1138,17 +1135,13 @@
           },
           {
             "name": "Mandatory skills",
+            "displayFolder": "Skills",
             "expression": "VALUES('Mandatory skills'[Skill])",
             "lineageTag": "5cfaa877-5388-46e0-ba48-0ff4347ecf5b"
           },
           {
-            "name": "Average mandatory skills",
-            "expression": "AVERAGE('Mandatory skills'[Skill])",
-            "formatString": "0",
-            "lineageTag": "f8a17557-b187-4ca4-922a-82570ef1f077"
-          },
-          {
             "name": "Average skills required per jobs nice to have",
+            "displayFolder": "Skills",
             "expression": [
               "",
               "var skills_per_job = ADDCOLUMNS('Unique Jobs DIM', \"CNT\", [Nice to have skills cnt])",
@@ -1160,6 +1153,7 @@
           },
           {
             "name": "Nice to have skills cnt",
+            "displayFolder": "Skills",
             "expression": "DISTINCTCOUNT('Optional skills'[Skill])",
             "formatString": "0",
             "lineageTag": "e2f06ef0-5c6c-4ff5-93b2-6cd36efaad82"
@@ -1217,6 +1211,7 @@
           },
           {
             "name": "Unique jobs count",
+            "displayFolder": "Counts",
             "expression": [
               "",
               "var cnt = DISTINCTCOUNT('Unique Jobs DIM'[Company--title])",
@@ -1227,6 +1222,7 @@
           },
           {
             "name": "Skills %",
+            "displayFolder": "Skills",
             "expression": [
               "",
               "var id_count = [Unique jobs count]",
@@ -1239,6 +1235,7 @@
           },
           {
             "name": "Mandatory Skills KPI",
+            "displayFolder": "KPI",
             "expression": [
               "",
               "var skill_unique_table = DISTINCT('Mandatory skills'[Skill])",
@@ -1251,6 +1248,8 @@
           },
           {
             "name": "Technology",
+            "description": "Return technologu in table row",
+            "displayFolder": "Technology",
             "expression": [
               "",
               "var technology = CALCULATE(MAX('Technology DIM'[Technology Pretty]), CROSSFILTER('Jobs ID'[Technology], 'Technology DIM'[Technology], Both))",
@@ -1262,6 +1261,7 @@
           },
           {
             "name": "Nice To Have Skills KPI",
+            "displayFolder": "KPI",
             "expression": [
               "",
               "var skill_unique_table = DISTINCT('Optional skills'[Skill])",
@@ -1276,6 +1276,20 @@
               "return value_to_return"
             ],
             "lineageTag": "c9ab89d7-8bd2-469d-bebd-8975e6e9c1a5"
+          },
+          {
+            "name": "Data to download",
+            "displayFolder": "Quality",
+            "expression": "COUNT('Unique Jobs DIM'[Company - Title])",
+            "formatString": "0",
+            "lineageTag": "268a1533-8b19-4d1a-a9e4-5daef630aea7"
+          },
+          {
+            "name": "Data to clean",
+            "displayFolder": "Quality",
+            "expression": "DISTINCTCOUNT('Mandatory skills'[Company--title])",
+            "formatString": "0",
+            "lineageTag": "7200a7cf-3184-43f5-907d-244189498549"
           }
         ],
         "partitions": [
@@ -1928,10 +1942,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
@@ -1996,10 +2006,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
@@ -2028,6 +2034,22 @@
             "lineageTag": "fc04bb67-93ef-433f-bba2-eb245523c26f",
             "sourceColumn": "Skill",
             "summarizeBy": "none"
+          },
+          {
+            "name": "Empty relations",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "boolean",
+            "expression": "ISBLANK(RELATED('Unique Jobs DIM'[Company--title]))",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "isDataTypeInferred": true,
+            "lineageTag": "ac6a5f4d-5a8f-4e82-b052-f1a2869ad688",
+            "summarizeBy": "none",
+            "type": "calculated"
           }
         ],
         "lineageTag": "edec3e85-f181-4fe9-b4b3-7545dd6da270",
@@ -2057,10 +2079,6 @@
           {
             "name": "PBI_ResultType",
             "value": "Table"
-          },
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
           }
         ],
         "columns": [
@@ -2466,10 +2484,6 @@
         "name": "Unique Jobs DIM",
         "annotations": [
           {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
-          {
             "name": "PBI_ResultType",
             "value": "Table"
           }
@@ -2528,6 +2542,22 @@
             "lineageTag": "e37d4be9-0a05-45b7-81f6-1f43483dff5a",
             "summarizeBy": "none",
             "type": "calculated"
+          },
+          {
+            "name": "Empty relations",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "boolean",
+            "expression": "ISEMPTY(RELATEDTABLE('Mandatory skills'))",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "isDataTypeInferred": true,
+            "lineageTag": "e4fe95bb-8100-4740-bc07-84a044ba0699",
+            "summarizeBy": "none",
+            "type": "calculated"
           }
         ],
         "lineageTag": "13c156a6-7076-4f7f-85ea-1dbaf3b5b463",
@@ -2559,10 +2589,6 @@
       {
         "name": "Job Group",
         "annotations": [
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navigation"
-          },
           {
             "name": "PBI_ResultType",
             "value": "Table"
