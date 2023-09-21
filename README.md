@@ -14,3 +14,4 @@ Future improvement:
    - Improving quality of skills data: Fixing problematic webpages and cleaning data.
    - Add currency exchanges.
    - Add Average selection from jobs data (job-min, job-max, job-average)
+   - Skills relation and information. 
