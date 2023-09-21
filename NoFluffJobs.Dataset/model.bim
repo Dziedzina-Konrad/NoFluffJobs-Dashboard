@@ -954,48 +954,40 @@
             "name": "% of Average",
             "expression": [
               "",
-              "var techValue = SELECTEDVALUE('Technology DIM'[Technology], BLANK())",
-              "var categoryValue = SELECTEDVALUE('Category DIM'[Category], BLANK())",
+              "var jobs_value = SELECTEDVALUE('Jobs ID'[company--title], BLANK())",
+              "var category_value = SELECTEDVALUE('Category DIM'[Category], BLANK())",
               "",
-              "var techTest = NOT ISBLANK(techValue)",
-              "var categoryTest = NOT ISBLANK(categoryValue)",
+              "var job_test = NOT ISBLANK(jobs_value)",
+              "var category_test = NOT ISBLANK(category_value)",
               "",
-              "var avgSalaryFrom = [Salary AVG From]",
-              "var avgSalaryTo = [Salary AVG To]",
+              "var avg_salary_from = [Salary AVG From]",
+              "var avg_salary_to = [Salary AVG To]",
               "",
-              "var categoryFrom = ROUND(CALCULATE([Salary AVG From], ",
-              "                            ALL('Technology DIM'), ",
-              "                            ALL('Jobs ID'[Company]))",
-              "                            ,0)",
-              "var categoryTo = ROUND(CALCULATE([Salary AVG To], ",
-              "                            ALL('Technology DIM'), ",
-              "                            ALL('Jobs ID'[Company]))",
-              "                            ,0)",
+              "var category_from = ROUND(CALCULATE([Salary AVG From],",
+              "                            ALL('Unique Jobs DIM'),",
+              "                            'Category DIM'[Category - Pretty] = category_value)",
+              "                        ,0)",
+              "var category_to = ROUND(CALCULATE([Salary AVG To],",
+              "                            ALL('Unique Jobs DIM'),",
+              "                            'Category DIM'[Category - Pretty] = category_value)",
+              "                        ,0)",
               "",
-              "var totalFrom = CALCULATE([Average Category From], ALL('Category DIM'))",
-              "var totalTo = CALCULATE([Average Category To], ALL('Category DIM'))",
+              "var total_from = CALCULATE([Average Category From], ALL('Category DIM'))",
+              "var total_to = CALCULATE([Average Category To], ALL('Category DIM'))",
               "",
-              "var technologyLevel = FORMAT(DIVIDE(avgSalaryFrom, categoryFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, categoryTo), \"Percent\")",
-              "var categoryLevel = FORMAT(DIVIDE(avgSalaryFrom, totalFrom), \"Percent\") & \" - \" & FORMAT(DIVIDE(avgSalaryTo, totalTo), \"Percent\")",
+              "var technology_level = FORMAT(DIVIDE(avg_salary_from, category_from), \"Percent\") & \" - \" & FORMAT(DIVIDE(avg_salary_to, category_to), \"Percent\")",
+              "var category_level = FORMAT(DIVIDE(avg_salary_from, total_from), \"Percent\") & \" - \" & FORMAT(DIVIDE(avg_salary_to, total_to), \"Percent\")",
               "",
-              "var avgSalaryTest = NOT ISBLANK(avgSalaryFrom)",
+              "var avg_salary_test = NOT ISBLANK(avg_salary_from)",
               "",
-              "var test = IF(techTest && avgSalaryTest, technologyLevel, IF(categoryTest && avgSalaryTest, categoryLevel))",
-              "return test"
+              "var value_to_return = IF( job_test && avg_salary_test,",
+              "                            technology_level, ",
+              "                            IF(",
+              "                                category_test && avg_salary_test , ",
+              "                                category_level))",
+              "return value_to_return"
             ],
             "lineageTag": "d30c7622-c4e9-412b-990d-b514252a70af"
-          },
-          {
-            "name": "Previous level",
-            "expression": [
-              "",
-              "var techTest = NOT ISBLANK(SELECTEDVALUE('Technology DIM'[Technology], BLANK()))",
-              "var categoryTest = NOT ISBLANK(SELECTEDVALUE('Tech category DIM'[Category], BLANK()))",
-              "var avgSalary = NOT ISBLANK([Salary AVG From])",
-              "var test = IF(techTest && avgSalary, \"Category\", IF(categoryTest && avgSalary, \"Total\"))",
-              "return test"
-            ],
-            "lineageTag": "9f4444d8-8fc9-4c31-b611-9813c50747e8"
           },
           {
             "name": "Average Category From",
@@ -1115,16 +1107,6 @@
             ],
             "formatString": "0",
             "lineageTag": "3446722c-e6ef-4604-99f0-605236996e97"
-          },
-          {
-            "name": "Measure",
-            "annotations": [
-              {
-                "name": "43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c",
-                "value": "True"
-              }
-            ],
-            "lineageTag": "52a68f16-2e35-438a-9cab-19a9bd9c6f4a"
           },
           {
             "name": "Lowest 20 Percent Avg",
@@ -1254,6 +1236,46 @@
             ],
             "formatString": "0.00%;-0.00%;0.00%",
             "lineageTag": "69f81866-b4c5-4f51-832d-759f5e40bcb1"
+          },
+          {
+            "name": "Mandatory Skills KPI",
+            "expression": [
+              "",
+              "var skill_unique_table = DISTINCT('Mandatory skills'[Skill])",
+              "var skills = CONCATENATEX(skill_unique_table, [Skill], UNICHAR(10))",
+              "var test = COUNTROWS(skill_unique_table) >= 35",
+              "var value_to_return = IF(test, \"To many skills\", skills)",
+              "return value_to_return"
+            ],
+            "lineageTag": "81427094-4156-4bd9-9b43-b531b361f52a"
+          },
+          {
+            "name": "Technology",
+            "expression": [
+              "",
+              "var technology = CALCULATE(MAX('Technology DIM'[Technology Pretty]), CROSSFILTER('Jobs ID'[Technology], 'Technology DIM'[Technology], Both))",
+              "var test_selection = HASONEVALUE('Jobs ID'[Technology])",
+              "var value_to_return = IF(test_selection, technology, BLANK())",
+              "return value_to_return"
+            ],
+            "lineageTag": "f9588ae7-54f3-4277-826c-d96f7594be48"
+          },
+          {
+            "name": "Nice To Have Skills KPI",
+            "expression": [
+              "",
+              "var skill_unique_table = DISTINCT('Optional skills'[Skill])",
+              "var skills = CONCATENATEX(skill_unique_table, [Skill], UNICHAR(10))",
+              "var test = COUNTROWS(skill_unique_table) >= 35",
+              "var blank_test = NOT ISBLANK(skills)",
+              "var value_to_return = IF(test && blank_test, ",
+              "                            \"To many skills\", ",
+              "                            IF(blank_test,",
+              "                                skills,",
+              "                                \"No optional skills\"))",
+              "return value_to_return"
+            ],
+            "lineageTag": "c9ab89d7-8bd2-469d-bebd-8975e6e9c1a5"
           }
         ],
         "partitions": [
@@ -2491,6 +2513,21 @@
             "lineageTag": "44dee5dd-8bad-4b4f-813c-53a0d5ff277a",
             "sourceColumn": "Company--title",
             "summarizeBy": "none"
+          },
+          {
+            "name": "Company - Title",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "expression": "'Unique Jobs DIM'[Company] & \" -\" & UNICHAR(10) & 'Unique Jobs DIM'[Title]",
+            "isDataTypeInferred": true,
+            "lineageTag": "e37d4be9-0a05-45b7-81f6-1f43483dff5a",
+            "summarizeBy": "none",
+            "type": "calculated"
           }
         ],
         "lineageTag": "13c156a6-7076-4f7f-85ea-1dbaf3b5b463",
