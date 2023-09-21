@@ -110,8 +110,10 @@ class NoFluffJobs():
    
    
    def create_skills_df(self):
+      """Create dataframes from mandatory_skills and nice_to_have_skills.\n
+      Dataframes are saved as self.mandatory_df and self.nice_to_have_df.
+      """
       for data in self.mandatory_skills:
-         # Tworzenie DataFrame dla każdej pary i dodanie go do listy
          temp_df = pd.DataFrame({
             'Company--title': [data[0]] * len(data[1]),
             'Skill': data[1]
@@ -120,7 +122,6 @@ class NoFluffJobs():
          
          
       for data in self.nice_to_have_skills:
-         # Tworzenie DataFrame dla każdej pary i dodanie go do listy
          temp_df = pd.DataFrame({
             'Company--title': [data[0]] * len(data[1]),
             'Skill': data[1]
@@ -141,6 +142,13 @@ class NoFluffJobs():
    
    
    def load_saved_files(self, mandatory_csv="test\\mandatory_safe_point.csv", nice_to_have_csv="test\\optional_safe_point.csv", sep=";"):
+      """Load files and update mandatory_df and nice_to_have_df
+
+      Args:
+          mandatory_csv (str, optional): File to load mandatory data. Defaults to "test\mandatory_safe_point.csv".
+          nice_to_have_csv (str, optional): File to load nice to have data. Defaults to "test\optional_safe_point.csv".
+          sep (str, optional): Seperator of file. Defaults to ";".
+      """
       mandatory = pd.read_csv(mandatory_csv, sep=sep , index_col = False)
       self.mandatory_df = pd.concat([self.mandatory_df, mandatory])
       print("Loading nice to have data.")
