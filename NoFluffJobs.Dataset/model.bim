@@ -770,10 +770,8 @@
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
-              "var sumMin = SUM('Jobs ID'[Salary from])",
-              "var sumMax = SUM('Jobs ID'[Salary to])",
-              "var countSalaryRows = COUNTROWS('Jobs ID')",
-              "var averageSalary = (sumMax + sumMin) / (countSalaryRows * 2)",
+              "var cnt_rows = COUNTROWS('Salary DIM')",
+              "var averageSalary = SUM('Salary DIM'[Salary mid]) / cnt_rows",
               "var valueToReturn = IF(",
               "    ISBLANK(averageSalary),",
               "    \"No jobs\", ",
@@ -879,45 +877,11 @@
             "lineageTag": "da3091b4-fd93-4dcc-acdd-e7f8fd588854"
           },
           {
-            "name": "Average Salary Seniority General",
-            "annotations": [
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
-            "displayFolder": "Salary\\AVG",
-            "expression": [
-              "",
-              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salary], ALL('Seniority DIM'))",
-              "return",
-              "    avgSalaryWithoutSenioroty"
-            ],
-            "lineageTag": "b1db4bfc-0aa9-41bc-a9bf-8186d21b3fa0"
-          },
-          {
             "name": "Jobs",
             "displayFolder": "Counts",
             "expression": "COUNTROWS('Salary DIM')",
             "formatString": "0",
             "lineageTag": "d9191273-a21e-4f65-9b1d-46a4ff2067ff"
-          },
-          {
-            "name": "Average Salary Seniority General 2",
-            "annotations": [
-              {
-                "name": "PBI_FormatHint",
-                "value": "{\"isGeneralNumber\":true}"
-              }
-            ],
-            "displayFolder": "Salary\\AVG",
-            "expression": [
-              "",
-              "var avgSalaryWithoutSenioroty = CALCULATE([Average Salary], ALL('Seniority DIM'))",
-              "return",
-              "    avgSalaryWithoutSenioroty"
-            ],
-            "lineageTag": "daabbf75-d4ba-4e1d-90a4-3aa3141db219"
           },
           {
             "name": "Salary AVG From",
@@ -958,7 +922,7 @@
             "lineageTag": "c2f114ee-5d34-4cae-855a-dcdb61b673a9"
           },
           {
-            "name": "% of Average",
+            "name": "% of Average range",
             "displayFolder": "Salary",
             "expression": [
               "",
@@ -968,20 +932,20 @@
               "var job_test = NOT ISBLANK(jobs_value)",
               "var category_test = NOT ISBLANK(category_value)",
               "",
-              "var avg_salary_from = [Salary AVG From]",
-              "var avg_salary_to = [Salary AVG To]",
+              "var avg_salary_from = AVERAGE('Unique Jobs DIM'[Salary from])",
+              "var avg_salary_to = AVERAGE('Unique Jobs DIM'[Salary to])",
               "",
-              "var category_from = ROUND(CALCULATE([Salary AVG From],",
+              "var category_from = ROUND(CALCULATE(AVERAGE('Unique Jobs DIM'[Salary from]),",
               "                            ALL('Unique Jobs DIM'),",
               "                            'Category DIM'[Category - Pretty] = category_value)",
               "                        ,0)",
-              "var category_to = ROUND(CALCULATE([Salary AVG To],",
+              "var category_to = ROUND(CALCULATE(AVERAGE('Unique Jobs DIM'[Salary to]),",
               "                            ALL('Unique Jobs DIM'),",
               "                            'Category DIM'[Category - Pretty] = category_value)",
               "                        ,0)",
               "",
-              "var total_from = CALCULATE([Average Category From], ALL('Category DIM'))",
-              "var total_to = CALCULATE([Average Category To], ALL('Category DIM'))",
+              "var total_from = CALCULATE(AVERAGE('Unique Jobs DIM'[Salary from]), ALL('Category DIM'))",
+              "var total_to = CALCULATE(AVERAGE('Unique Jobs DIM'[Salary to]), ALL('Category DIM'))",
               "",
               "var technology_level = FORMAT(DIVIDE(avg_salary_from, category_from), \"Percent\") & \" - \" & FORMAT(DIVIDE(avg_salary_to, category_to), \"Percent\")",
               "var category_level = FORMAT(DIVIDE(avg_salary_from, total_from), \"Percent\") & \" - \" & FORMAT(DIVIDE(avg_salary_to, total_to), \"Percent\")",
@@ -1055,8 +1019,7 @@
             "displayFolder": "KPI\\Salary",
             "expression": [
               "",
-              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", [Average Salary])",
-              "var average_salary = AVERAGEX(unique_jobs_salary, [Salary])",
+              "var average_salary = AVERAGEX('Unique Jobs DIM', 'Unique Jobs DIM'[Salary Mid])",
               "var value_to_return =  IF(ISBLANK(average_salary), [No jobs text], average_salary)",
               "",
               "return value_to_return"
@@ -1081,7 +1044,7 @@
             "displayFolder": "KPI\\Salary",
             "expression": [
               "",
-              "var median_salary = MEDIANX('Salary DIM', 'Salary DIM'[Salary mid] )",
+              "var median_salary = MEDIANX('Unique Jobs DIM', 'Unique Jobs DIM'[Salary Mid])",
               "var value_to_return = IF(ISBLANK(median_salary),[No jobs text], median_salary)",
               "",
               "return value_to_return"
@@ -1095,7 +1058,7 @@
             "expression": [
               "",
               "var top_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
-              "var top_20_percent = TOPN(top_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], DESC)",
+              "var top_20_percent = TOPN(top_20_percent_cnt, 'Unique Jobs DIM', 'Unique Jobs DIM'[Salary Mid], DESC)",
               "var average_top_20 = AVERAGEX(",
               "    top_20_percent, [Salary mid])",
               "var value_to_return = IF(ISBLANK(average_top_20), [No jobs text], average_top_20)",
@@ -1110,7 +1073,7 @@
             "expression": [
               "",
               "var bottom_20_percent_cnt = ROUND(COUNTROWS('Salary DIM') * 0.2, 0)",
-              "var bottom_20_percent = TOPN(bottom_20_percent_cnt, 'Salary DIM', 'Salary DIM'[Salary mid], ASC)",
+              "var bottom_20_percent = TOPN(bottom_20_percent_cnt, 'Unique Jobs DIM', 'Unique Jobs DIM'[Salary Mid], ASC)",
               "var average_bottom_20 = AVERAGEX(",
               "    bottom_20_percent, [Salary mid])",
               "var value_to_return = IF(ISBLANK(average_bottom_20), [No jobs text], average_bottom_20)",
@@ -1124,8 +1087,8 @@
             "displayFolder": "Salary\\AVG",
             "expression": [
               "",
-              "var range_min = ROUND(AVERAGE('Salary DIM'[Salary from]),0)",
-              "var range_max = ROUND(AVERAGE('Salary DIM'[Salary to]),0)",
+              "var range_min = ROUND(AVERAGE('Unique Jobs DIM'[Salary from]),0)",
+              "var range_max = ROUND(AVERAGE('Unique Jobs DIM'[Salary to]),0)",
               "var format_to_return = range_min & \" - \" & range_max ",
               "var range_test = NOT ISBLANK(range_max)",
               "var return_value = IF(range_test, format_to_return, BLANK())",
@@ -1290,6 +1253,42 @@
             "expression": "DISTINCTCOUNT('Mandatory skills'[Company--title])",
             "formatString": "0",
             "lineageTag": "7200a7cf-3184-43f5-907d-244189498549"
+          },
+          {
+            "name": "Unique Average Salary From",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", AVERAGE('Salary DIM'[Salary from]))",
+              "var average_salary = AVERAGEX(unique_jobs_salary, [Salary])",
+              "var value_to_return =  IF(ISBLANK(average_salary), [No jobs text], average_salary)",
+              "",
+              "return value_to_return"
+            ],
+            "lineageTag": "29271e48-2a0c-4493-adcf-bc0174b0d40d"
+          },
+          {
+            "name": "Unique Average Salary To",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "var unique_jobs_salary = ADDCOLUMNS('Unique Jobs DIM', \"Salary\", AVERAGE('Salary DIM'[Salary to]))",
+              "var average_salary = AVERAGEX(unique_jobs_salary, [Salary])",
+              "var value_to_return =  IF(ISBLANK(average_salary), [No jobs text], average_salary)",
+              "",
+              "return value_to_return"
+            ],
+            "lineageTag": "25164df6-1511-433d-abe6-6021fde2df50"
           }
         ],
         "partitions": [
@@ -2565,6 +2564,60 @@
             "isDataTypeInferred": true,
             "lineageTag": "e4fe95bb-8100-4740-bc07-84a044ba0699",
             "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Salary Mid",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "expression": "CALCULATE(AVERAGE('Salary DIM'[Salary mid]))",
+            "isDataTypeInferred": true,
+            "lineageTag": "75691bad-8fb6-45d3-9482-c31daba11d5b",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Salary from",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "double",
+            "expression": "CALCULATE(AVERAGE('Salary DIM'[Salary from]))",
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "lineageTag": "d14c1da3-bddd-4e33-b12b-c2f14d828581",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Salary to",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "expression": "CALCULATE(Average('Salary DIM'[Salary to]))",
+            "isDataTypeInferred": true,
+            "lineageTag": "23e5a44c-efec-4677-8969-ee5b08e38bf4",
+            "summarizeBy": "sum",
             "type": "calculated"
           }
         ],

@@ -1,0 +1,62 @@
+{
+  "name": "NoFluffJobs",
+  "dataColors": [
+    "#012FA3",
+    "#4818D6",
+    "#8202A3",
+    "#653970",
+    "#DBC14F",
+    "#A37402",
+    "#88A0E0",
+    "#2C6EA8"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#070f25",
+  "tableAccent": "#0F1934",
+  "textClasses": {
+    "title": {
+      "fontFace": "Poppins",
+      "fontSize": 17
+    },
+    "label": {
+      "fontFace": "Poppins",
+      "fontSize": 15
+    },
+    "callout": {
+      "fontFace": "Poppins"
+    },
+    "header": {
+      "fontFace": "Poppins",
+      "fontSize": 17
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 100
+          }
+        ]
+      }
+    }
+  }
+}
